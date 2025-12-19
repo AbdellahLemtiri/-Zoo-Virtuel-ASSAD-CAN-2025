@@ -1,6 +1,34 @@
 <?php
 
+require_once 'fx/connect.php';
+
+// Récupération des utilisateurs
+$query = "SELECT id, nom, email, role, approuve FROM utilisateurs";
+$result = mysqli_query($connect, $query);
+
+// Fonction pour activer/désactiver un utilisateur
+if (isset($_GET['toggle_status'])) {
+    $user_id = $_GET['toggle_status'];
+    
+    // Récupérer l'état actuel de l'utilisateur
+    $status_query = "SELECT approuve FROM utilisateurs WHERE id = $user_id";
+    $status_result = mysqli_query($connect, $status_query);
+    $user = mysqli_fetch_assoc($status_result);
+
+    // Inverser l'état (si approuve == 1, mettre à 0, sinon mettre à 1)
+    $new_status = ($user['approuve'] == 1) ? 0 : 1;
+    
+    // Mettre à jour le statut dans la base de données
+    $update_query = "UPDATE utilisateurs SET approuve = $new_status WHERE id = $user_id";
+    mysqli_query($connect, $update_query);
+    
+    // Rediriger après la mise à jour
+    header("Location: admin_users.php");
+    exit;
+}
+
 ?>
+
 
 <!DOCTYPE html>
 <html class="light" lang="fr">
@@ -55,7 +83,7 @@
 
 <body
     class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display antialiased min-h-screen flex overflow-hidden">
- <?php
+    <?php
 // On détecte la page actuelle pour allumer le bon bouton
 $current_page = basename($_SERVER['PHP_SELF']);
 
@@ -90,7 +118,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
             <nav class="flex flex-col gap-2">
                 
-            <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
+              <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span class="text-sm font-semibold">Vue d'ensemble</span>
                 </a>
@@ -110,10 +138,7 @@ function nav_item($href, $icon, $label, $current_page) {
                     <span class="text-sm font-semibold">Utilisateurs</span>
                 </a>
 
-                <a href="settings.php" class="<?= nav_item('settings.php', 'settings', 'Paramètres', $current_page) ?>">
-                    <span class="material-symbols-outlined text-[22px] group-hover:rotate-45 transition-transform duration-500">settings</span>
-                    <span class="text-sm font-semibold">Paramètres</span>
-                </a>
+            
 
             </nav>
         </div>
@@ -127,7 +152,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         <span class="absolute bottom-0 right-0 h-3 w-3 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                     </div>
                     <div class="flex flex-col">
-                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200"><?= $nom_utilisateur ?></p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200">ADMIN ASSAD</p>
                         <p class="text-[11px] text-slate-400 font-medium italic">Super Admin</p>
                     </div>
                 </div>
@@ -139,6 +164,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
     </div>
 </aside>
+
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header
             class="bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 shrink-0 z-10">
@@ -152,11 +178,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         </p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
-                            <span class="material-symbols-outlined text-lg">person_add</span>
-                            Ajouter Utilisateur
-                        </button>
+                   
                     </div>
                 </div>
             </div>
@@ -166,9 +188,9 @@ function nav_item($href, $icon, $label, $current_page) {
                 
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                     <div class="flex flex-wrap gap-3">
-                        <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($users) ?>)</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Guides (<?= count(array_filter($users, fn($u) => $u['role'] === 'guide')) ?>)</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Visiteurs (<?= count(array_filter($users, fn($u) => $u['role'] === 'visitor')) ?>)</button>
+                        <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (?>)</button>
+                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Guides ()</button>
+                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Visiteurs ()</button>
                     </div>
                     <div class="relative w-full md:w-auto">
                         <span
@@ -182,108 +204,39 @@ function nav_item($href, $icon, $label, $current_page) {
                 <div
                     class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead
-                                class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Utilisateur</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Rôle</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Statut</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Dernière Connexion</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">
-                                        Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                                USER 
-                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                                        <td class="px-6 py-3">
-                                            <div class="flex items-center gap-3">
-                                                <div class="flex flex-col">
-                                                    <span class="font-bold text-text-light dark:text-text-dark">
-                                                    NAME</span>
-                                                    <span class="text-xs text-text-secondary-light truncate">MAIL</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-3">
-                                           <!-- //ROLE -->
-                                        </td>
-                                        <td class="px-6 py-3">
-                                         <!-- STATUS -->
-                                            <span class="text-xs text-gray-500 capitalize">STATUS</span>
-                                        
-                                        <td class="px-6 py-3 text-right">
-                                            <div
-                                                class="flex items-center justify-end gap-1">
-                                                <button
-                                                    class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
-                                                    title="Voir/Éditer le profil">
-                                                    <span class="material-symbols-outlined text-lg">visibility</span>
-                                                </button>
-                                                <?php
-                                                //  if ($user['status'] === 'active'): 
-                                                 ?>
-                                                    <button
-                                                        class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-yellow-500"
-                                                        title="Suspendre">
-                                                        <span class="material-symbols-outlined text-lg">lock</span>
-                                                    </button>
-                                                <?php
-                                            //  else: 
-                                             ?>
-                                                    <button
-                                                        class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-green-500"
-                                                        title="Activer">
-                                                        <span class="material-symbols-outlined text-lg">lock_open</span>
-                                                    </button>
-                                                <?php 
-                                            // endif; 
-                                            ?>
-                                                <?php 
-                                                // if ($user['role'] !== 'admin'):
-                                                 ?>
-                                                    <button
-                                                        class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
-                                                        title="Supprimer">
-                                                        <span class="material-symbols-outlined text-lg">delete</span>
-                                                    </button>
-                                                <?php
-                                            //  endif; 
-                                             ?>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php
-                            //  endforeach; 
-                             ?>
-                            </tbody>
-                        </table>
-                        <?php 
-                        // if (empty($users)):
-                         ?>
-                             <div class="p-6 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
-                                Aucun utilisateur trouvé.
-                            </div>
-                        <?php 
-                    // endif; 
-                    ?>
-                    </div>
-                </div>
-            </div>
-            <div class="pb-6 text-center">
-                <p class="text-[10px] text-gray-300 uppercase tracking-[0.2em] font-bold">Inspiré par la force des Lions
-                    de l'Atlas</p>
-            </div>
+<table class="min-w-full table-auto bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
+    <thead class="bg-emerald-600 text-white">
+        <tr>
+            <th class="px-6 py-3 text-left text-sm font-medium">Utilisateur</th>
+            <th class="px-6 py-3 text-left text-sm font-medium">Rôle</th>
+            <th class="px-6 py-3 text-left text-sm font-medium">Statut</th>
+            <th class="px-6 py-3 text-center text-sm font-medium">Actions</th>
+        </tr>
+    </thead>
+    <tbody class="text-sm text-gray-700 dark:text-gray-300">
+        <?php while ($user = mysqli_fetch_assoc($result)): ?>
+            <tr class="hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors duration-300">
+                <td class="px-6 py-4"><?= $user['nom'] ?> <span class="text-xs text-gray-500">(<?= $user['email'] ?>)</span></td>
+                <td class="px-6 py-4"><?= ucfirst($user['role']) ?></td>
+                <td class="px-6 py-4">
+                    <span class="text-xs <?= $user['approuve'] == 1 ? 'text-green-500' : 'text-red-500' ?>">
+                        <?= $user['approuve'] == 1 ? 'Actif' : 'Inactif' ?>
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <a href="?toggle_status=<?= $user['id'] ?>" class="p-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-300">
+                        <span class="material-symbols-outlined text-lg">
+                            <?= $user['approuve'] == 1 ? 'toggle_on' : 'toggle_off' ?>
+                        </span>
+                    </a>
+                </td>
+            </tr>
+        <?php endwhile; ?>
+    </tbody>
+</table>
+
+
+                
         </div>
     </main>
 

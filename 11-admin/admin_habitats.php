@@ -1,4 +1,12 @@
 <?php
+require_once "fx/connect.php";
+
+$sql = "SELECT * FROM habitats";
+$res = $connect->query($sql);
+$habitats = [];
+if ($res) {
+    $habitats = $res->fetch_all(MYSQLI_ASSOC);
+}
 
 ?>
 
@@ -15,7 +23,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
+ <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -104,10 +112,7 @@ function nav_item($href, $icon, $label, $current_page) {
                     <span class="text-sm font-semibold">Utilisateurs</span>
                 </a>
 
-                <a href="settings.php" class="<?= nav_item('settings.php', 'settings', 'Paramètres', $current_page) ?>">
-                    <span class="material-symbols-outlined text-[22px] group-hover:rotate-45 transition-transform duration-500">settings</span>
-                    <span class="text-sm font-semibold">Paramètres</span>
-                </a>
+            
 
             </nav>
         </div>
@@ -121,7 +126,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         <span class="absolute bottom-0 right-0 h-3 w-3 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                     </div>
                     <div class="flex flex-col">
-                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200"><?= $nom_utilisateur ?></p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200">ADMIN ASSAD</p>
                         <p class="text-[11px] text-slate-400 font-medium italic">Super Admin</p>
                     </div>
                 </div>
@@ -133,6 +138,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
     </div>
 </aside>
+
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header
             class="bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 shrink-0 z-10">
@@ -146,24 +152,21 @@ function nav_item($href, $icon, $label, $current_page) {
                         </p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
+                        <a href="#" data-modal-toggle="modal_add_habitat" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
                             <span class="material-symbols-outlined text-lg">add_location_alt</span>
                             Ajouter Nouvel Habitat
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
         </header>
         <div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
             <div class="max-w-7xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
-                
+
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                     <div class="flex flex-wrap gap-3">
                         <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($habitats) ?>)</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Savane</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Jungle</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Marais</button>
+
                     </div>
                     <div class="relative w-full md:w-auto">
                         <span
@@ -178,91 +181,61 @@ function nav_item($href, $icon, $label, $current_page) {
                     class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead
-                                class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
+                            <thead class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Nom / ID</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Type</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-center">
-                                        Nb. Animaux</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Guide Responsable</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                        Statut</th>
-                                    <th
-                                        class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">
-                                        Actions</th>
+                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">Nom / ID</th>
+                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">Type</th>
+                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-center">Nb. Animaux</th>
+
+                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">Statut</th>
+                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                             FOREACH
-                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                                        <td class="px-6 py-3">
-                                            <div class="flex items-center gap-3">
-                                                <span class="material-symbols-outlined text-2xl text-primary">TYPR</span>
-                                                <div class="flex flex-col">
-                                                    <span class="font-bold text-text-light dark:text-text-dark">NAMR</span>
-                                                    <span class="text-xs text-text-secondary-light">ID:ID</span>
+                                <?php if (count($habitats) > 0): ?>
+                                    <?php foreach ($habitats as $hab): ?>
+                                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
+                                            <td class="px-6 py-3">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="material-symbols-outlined text-2xl text-primary">forest</span>
+                                                    <div class="flex flex-col">
+                                                        <span class="font-bold text-text-light dark:text-text-dark"><?= $hab['nom'] ?></span>
+                                                        <span class="text-xs text-text-secondary-light">ID: <?= $hab['id'] ?></span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-3">
-                                            <span class="text-text-light dark:text-text-dark font-medium">TYPR</span>
-                                        </td>
-                                        <td class="px-6 py-3 text-center">
-                                            <span class="font-bold text-lg text-primary">ANIMALCOUNT</span>
-                                        </td>
-                                        <td class="px-6 py-3">
-                                            <span class="text-text-light dark:text-text-dark font-medium">GIDE</span>
-                                        </td>
-                                        <td class="px-6 py-3">
-                                           STATUS
-                                        </td>
-                                        <td class="px-6 py-3 text-right">
-                                            <div
-                                                class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
-                                                    title="Éditer les détails">
-                                                    <span class="material-symbols-outlined text-lg">edit</span>
-                                                </button>
-                                                <button
-                                                    class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-primary"
-                                                    title="Voir les animaux résidents">
-                                                    <span class="material-symbols-outlined text-lg">pets</span>
-                                                </button>
-                                                <button
-                                                    class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
-                                                    title="Supprimer">
-                                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                              END
+                                            </td>
+                                            <td class="px-6 py-3"><?= $hab['type_climat'] ?></td>
+                                            <td class="px-6 py-3 text-center"><?= $hab['id'] ?></td>
+
+                                            <td class="px-6 py-3">
+                                                <span class="text-text-light dark:text-text-dark font-medium"><?= $hab['zone_zoo'] ?></span>
+                                            </td>
+                                            <td class="px-6 py-3 text-right">
+                                                <div class="flex items-center justify-end gap-1 group-hover:opacity-100 transition-opacity">
+                                                    <a href="fx/edit_habitat.php?id=<?= $hab['id'] ?>" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500" title="Éditer les détails">
+                                                        <span class="material-symbols-outlined text-lg">edit</span>
+                                                    </a>
+                                                    <a href="fx/delet_hab.php?id=<?= $hab['id'] ?>" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500" title="Supprimer">
+                                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="p-6 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
+                                        Aucun habitat trouvé.
+                                    </div>
+                                <?php endif; ?>
                             </tbody>
                         </table>
-                        <?php if (empty($habitats)): ?>
-                             <div class="p-6 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
-                                Aucun habitat trouvé.
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            <div class="pb-6 text-center">
-                <p class="text-[10px] text-gray-300 uppercase tracking-[0.2em] font-bold">Inspiré par la force des Lions
-                    de l'Atlas</p>
-            </div>
         </div>
+
     </main>
+
 
 </body>
 

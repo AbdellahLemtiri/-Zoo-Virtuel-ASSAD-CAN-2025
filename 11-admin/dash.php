@@ -113,10 +113,7 @@ function nav_item($href, $icon, $label, $current_page) {
                     <span class="text-sm font-semibold">Utilisateurs</span>
                 </a>
 
-                <a href="settings.php" class="<?= nav_item('settings.php', 'settings', 'Paramètres', $current_page) ?>">
-                    <span class="material-symbols-outlined text-[22px] group-hover:rotate-45 transition-transform duration-500">settings</span>
-                    <span class="text-sm font-semibold">Paramètres</span>
-                </a>
+            
 
             </nav>
         </div>
@@ -130,7 +127,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         <span class="absolute bottom-0 right-0 h-3 w-3 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
                     </div>
                     <div class="flex flex-col">
-                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200"><?= $nom_utilisateur ?></p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200">ADMIN ASSAD</p>
                         <p class="text-[11px] text-slate-400 font-medium italic">Super Admin</p>
                     </div>
                 </div>
