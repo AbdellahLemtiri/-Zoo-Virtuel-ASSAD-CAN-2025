@@ -1,63 +1,62 @@
 <?php
 require_once "fx/connect.php";
 
-$sql = "SELECT * FROM habitats";
-$res = $connect->query($sql);
-$habitats = [];
-if ($res) {
-    $habitats = $res->fetch_all(MYSQLI_ASSOC);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $nom = $_POST['nom'];
+    $type_climat = $_POST['type_climat'];
+    $description = $_POST['description'];
+    $zone_zoo = $_POST['zone_zoo'];
+
+    if ($_POST['action'] === 'add') {
+        $stmt = $connect->prepare("INSERT INTO habitats (nom, type_climat, description, zone_zoo) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $nom, $type_climat, $description, $zone_zoo);
+        $stmt->execute();
+    } 
+    elseif ($_POST['action'] === 'edit') {
+        $id = $_POST['id'];
+        $stmt = $connect->prepare("UPDATE habitats SET nom=?, type_climat=?, description=?, zone_zoo=? WHERE id=?");
+        $stmt->bind_param("ssssi", $nom, $type_climat, $description, $zone_zoo, $id);
+        $stmt->execute();
+    }
+    header("Location: admin_habitats.php");
+    exit();
 }
+
+$sql = "SELECT h.*, COUNT(a.id) as nb_animaux 
+        FROM habitats h 
+        LEFT JOIN animaux a ON h.id = a.id_habitat 
+        GROUP BY h.id";
+$res = $connect->query($sql);
+$habitats = ($res) ? $res->fetch_all(MYSQLI_ASSOC) : [];
+
 
 ?>
 
 <!DOCTYPE html>
 <html class="light" lang="fr">
-
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Gestion des Habitats - ASSAD Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
- <script id="tailwind-config">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "primary": "#ec7f13",
-                        "primary-dark": "#d16a0a",
-                        "background-light": "#f8f7f6",
-                        "background-dark": "#221910",
-                        "surface-light": "#ffffff",
-                        "surface-dark": "#2d241b",
-                        "text-light": "#1b140d",
-                        "text-dark": "#f0e6dd",
-                        "text-secondary-light": "#9a734c",
-                        "text-secondary-dark": "#b08d6b",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
-            },
+                    colors: { "primary": "#ec7f13", "background-dark": "#221910", "surface-dark": "#2d241b" },
+                    fontFamily: { "display": ["Plus Jakarta Sans", "sans-serif"] }
+                }
+            }
         }
     </script>
 </head>
 
-<body
-    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display antialiased min-h-screen flex overflow-hidden">
-    <?php
+<body class="bg-gray-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex overflow-hidden">
+
+   <?php
 // On détecte la page actuelle pour allumer le bon bouton
 $current_page = basename($_SERVER['PHP_SELF']);
 
@@ -140,103 +139,128 @@ function nav_item($href, $icon, $label, $current_page) {
 </aside>
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <header
-            class="bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 shrink-0 z-10">
-            <div class="px-6 py-5 max-w-7xl mx-auto w-full">
-                <div class="flex flex-wrap justify-between items-end gap-4">
-                    <div class="flex flex-col gap-1">
-                        <h1 class="text-3xl font-black tracking-tight text-text-light dark:text-text-dark">Gestion des Habitats</h1>
-                        <p
-                            class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium flex items-center gap-1">
-                            Surveillance des zones virtuelles et de leur contenu
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <a href="#" data-modal-toggle="modal_add_habitat" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
-                            <span class="material-symbols-outlined text-lg">add_location_alt</span>
-                            Ajouter Nouvel Habitat
-                        </a>
-                    </div>
+        <header class="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 p-6">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-black">Gestion des Habitats</h1>
+                    <p class="text-slate-500 text-sm italic">Surveillance des zones virtuelles</p>
                 </div>
+                <button onclick="openModal('add')" class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-lg font-bold transition-all">
+                    <span class="material-symbols-outlined">add_location_alt</span> Ajouter Nouvel Habitat
+                </button>
             </div>
         </header>
-        <div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
-            <div class="max-w-7xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
 
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <div class="flex flex-wrap gap-3">
-                        <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($habitats) ?>)</button>
-
-                    </div>
-                    <div class="relative w-full md:w-auto">
-                        <span
-                            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
-                        <input
-                            class="pl-8 pr-3 py-1.5 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm w-full md:w-64 focus:ring-primary/20 focus:border-primary"
-                            placeholder="Rechercher par nom..." type="text" />
-                    </div>
-                </div>
-
-                <div
-                    class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
-                                <tr>
-                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">Nom / ID</th>
-                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">Type</th>
-                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-center">Nb. Animaux</th>
-
-                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">Statut</th>
-                                    <th class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                                <?php if (count($habitats) > 0): ?>
-                                    <?php foreach ($habitats as $hab): ?>
-                                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                                            <td class="px-6 py-3">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="material-symbols-outlined text-2xl text-primary">forest</span>
-                                                    <div class="flex flex-col">
-                                                        <span class="font-bold text-text-light dark:text-text-dark"><?= $hab['nom'] ?></span>
-                                                        <span class="text-xs text-text-secondary-light">ID: <?= $hab['id'] ?></span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-3"><?= $hab['type_climat'] ?></td>
-                                            <td class="px-6 py-3 text-center"><?= $hab['id'] ?></td>
-
-                                            <td class="px-6 py-3">
-                                                <span class="text-text-light dark:text-text-dark font-medium"><?= $hab['zone_zoo'] ?></span>
-                                            </td>
-                                            <td class="px-6 py-3 text-right">
-                                                <div class="flex items-center justify-end gap-1 group-hover:opacity-100 transition-opacity">
-                                                    <a href="fx/edit_habitat.php?id=<?= $hab['id'] ?>" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500" title="Éditer les détails">
-                                                        <span class="material-symbols-outlined text-lg">edit</span>
-                                                    </a>
-                                                    <a href="fx/delet_hab.php?id=<?= $hab['id'] ?>" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500" title="Supprimer">
-                                                        <span class="material-symbols-outlined text-lg">delete</span>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <div class="p-6 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
-                                        Aucun habitat trouvé.
+        <div class="flex-1 overflow-y-auto p-6">
+            <div class="max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800 text-slate-500">
+                        <tr>
+                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs">Nom / ID</th>
+                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs">Climat</th>
+                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs text-center">Nb. Animaux</th>
+                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        <?php foreach ($habitats as $hab): ?>
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 rounded-lg">
+                                        <span class="material-symbols-outlined">forest</span>
                                     </div>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                    <div>
+                                        <p class="font-bold"><?= htmlspecialchars($hab['nom']) ?></p>
+                                        <p class="text-[10px] text-slate-400">ID: #<?= $hab['id'] ?></p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-md text-xs font-semibold">
+                                    <?= htmlspecialchars($hab['type_climat']) ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center font-bold text-lg"><?= $hab['nb_animaux'] ?></td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button onclick='openModal("edit", <?= json_encode($hab) ?>)' class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined">edit</span>
+                                    </button>
+                                    <a href="fx/delet_hab.php?id=<?= $hab['id'] ?>" onclick="return confirm('Supprimer cet habitat ?')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
+        <div id="modalHabitat" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+            <form id="habitatForm" method="POST" class="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+                <input type="hidden" name="action" id="formAction" value="add">
+                <input type="hidden" name="id" id="habitatId">
+                
+                <div class="p-6 border-b dark:border-slate-800 flex justify-between items-center">
+                    <h2 id="modalTitle" class="text-xl font-bold">Ajouter un Habitat</h2>
+                    <button type="button" onclick="closeModal()" class="material-symbols-outlined">close</button>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Nom de l'habitat *</label>
+                        <input type="text" name="nom" id="formNom" required class="w-full rounded-xl border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Type de climat</label>
+                        <input type="text" name="type_climat" id="formClimat" placeholder="Ex: Tropical, Sec..." class="w-full rounded-xl border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Zone du Zoo</label>
+                        <input type="text" name="zone_zoo" id="formZone" placeholder="Ex: Zone Nord" class="w-full rounded-xl border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Description</label>
+                        <textarea name="description" id="formDesc" rows="3" class="w-full rounded-xl border-slate-200 dark:bg-slate-800 dark:border-slate-700"></textarea>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-gray-50 dark:bg-slate-800/50 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 font-bold text-slate-500">Annuler</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-700 transition-all">Enregistrer</button>
+                </div>
+            </form>
+        </div>
     </main>
 
+    <script>
+        const modal = document.getElementById('modalHabitat');
+        const form = document.getElementById('habitatForm');
 
+        function openModal(mode, data = null) {
+            modal.classList.remove('hidden');
+            if (mode === 'edit') {
+                document.getElementById('modalTitle').innerText = "Modifier l'Habitat";
+                document.getElementById('formAction').value = "edit";
+                document.getElementById('habitatId').value = data.id;
+                document.getElementById('formNom').value = data.nom;
+                document.getElementById('formClimat').value = data.type_climat;
+                document.getElementById('formZone').value = data.zone_zoo;
+                document.getElementById('formDesc').value = data.description;
+            } else {
+                document.getElementById('modalTitle').innerText = "Ajouter un Habitat";
+                document.getElementById('formAction').value = "add";
+                form.reset();
+            }
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+    </script>
 </body>
-
 </html>

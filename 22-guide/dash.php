@@ -1,56 +1,4 @@
-<?php
-session_start();
 
-// --- Inclusion du fichier de connexion à la base de données (à décommenter)
-// include "../db_connect.php"; 
-
-// 1. Vérification stricte des variables de session pour l'accès guide
-if (
-    isset($_SESSION['user_role'], $_SESSION['logged_in'], $_SESSION['user_id'], $_SESSION['user_name']) &&
-    $_SESSION['user_role'] === "guide" &&
-    $_SESSION['logged_in'] === TRUE
-) {
-    // Extraction des données de session
-    $id_utilisateur = htmlspecialchars($_SESSION['user_id']);
-    $nom_utilisateur = htmlspecialchars($_SESSION['user_name']);
-    $role_utilisateur = htmlspecialchars($_SESSION['user_role']);
-    
-    // 2. SIMULATION DES DONNÉES DU TABLEAU DE BORD (Remplacer par l'appel à la base de données)
-    
-    // Statistiques rapides
-    $stats = [
-        'next_tour_date' => '20 Jan 2025',
-        'next_tour_time' => '14:00',
-        'total_tours' => 18,
-        'upcoming_reservations' => 45,
-        'participants_last_month' => 185,
-        'guide_ranking' => 4.7,
-    ];
-
-    // Prochaine visite détaillée
-    $next_tour = [
-        'id' => 101, 
-        'title' => "L'Heure du Repas - Lions de l'Atlas", 
-        'date' => '20 Jan 2025', 
-        'time' => '14:00', 
-        'participants' => 45,
-        'link' => 'https://zoom.us/j/1234567890', // Lien d'exemple
-    ];
-    
-    // Dernières activités (simulées)
-    $recent_activity = [
-        ['type' => 'new_reservation', 'message' => 'Nouvelle réservation pour "Lions de l\'Atlas" (2 participants).', 'time' => 'il y a 5 minutes'],
-        ['type' => 'tour_edit', 'message' => 'Modification de la description pour "Lever de soleil dans la Savane".', 'time' => 'il y a 2 heures'],
-        ['type' => 'new_reservation', 'message' => 'Nouvelle réservation pour "Oasis Secrète" (1 participant).', 'time' => 'hier'],
-        ['type' => 'tour_completed', 'message' => 'Visite "Oiseaux migrateurs" complétée avec succès.', 'time' => 'il y a 3 jours'],
-    ];
-
-} else {
-    // Redirection de sécurité
-    header("Location: connexion.php?error=access_denied");
-    exit(); 
-}
-?>
 
 <!DOCTYPE html>
 
@@ -119,44 +67,61 @@ if (
 
 <body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-200">
     <div class="flex h-screen w-full overflow-hidden">
-        <aside class="hidden lg:flex flex-col w-72 border-r border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark p-6 h-full justify-between">
-            <div class="flex flex-col gap-8">
-                <div class="flex items-center gap-3 px-2">
-                    <div class="bg-primary/20 p-2 rounded-lg">
-                        <span class="material-symbols-outlined text-primary text-3xl">pets</span>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight">ASSAD</h1>
-                        <p class="text-text-sec-light dark:text-text-sec-dark text-xs uppercase tracking-wider font-semibold">Guide Space</p>
-                    </div>
-                </div>
-                <nav class="flex flex-col gap-2">
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary dark:text-primary font-bold" href="#">
-                        <span class="material-symbols-outlined">dashboard</span>
-                        <span>Tableau de bord</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="mes_visites.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">map</span>
-                        <span>Mes Visites</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="reservations.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">groups</span>
-                        <span>Réservations</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="parametres.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">settings</span>
-                        <span>Paramètres</span>
-                    </a>
-                </nav>
+        <?php
+
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+
+      <?php
+
+function nav_item($href, $label, $current_page) {
+    $is_active = ($current_page == $href);
+    
+ 
+    if ($is_active) {
+        return "flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none transition-all duration-300";
+    } 
+    // إذا لم يكن الرابط نشطًا، نُضيف فئة غير نشطة مع hover
+    else {
+        return "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 transition-all duration-200 group";
+    }
+}
+?>
+<aside class="hidden lg:flex flex-col w-72 border-r border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark p-6 h-full justify-between">
+    <div class="flex flex-col gap-8">
+        <div class="flex items-center gap-3 px-2">
+            <div class="bg-primary/20 p-2 rounded-lg">
+                <span class="material-symbols-outlined text-primary text-3xl">pets</span>
             </div>
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
-                <div class="bg-center bg-cover rounded-full h-10 w-10 border-2 border-primary" data-alt="Portrait du guide" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6SweDCChTHrnzUi3ijD-HqKt7FximPeaVPRuHptoZB3gCiNIREev191XH6lCU2g9dWO-0nb19loXauXqO29KxIYeVB8L_qXV7j_z9ew9PCkxmtTGzyhArcCoyjioHHD9oWPKFoA4SKfrqRSRlWptyCfastPtNkgSlFizXCwA60Izfk-CrC13bruBTAOjH610XOUvFB1RnfkoM-IeFW7fkvzAujenUwRWp02gjgWiOhb4zpbuGErPegntLM0188b1Dkbt6DnzndgR5");'></div>
-                <div class="flex flex-col overflow-hidden">
-                    <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
-                    <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate">Guide <?= $role_utilisateur ?></p>
-                </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">ASSAD</h1>
+                <p class="text-text-sec-light dark:text-text-sec-dark text-xs uppercase tracking-wider font-semibold">Guide Space</p>
             </div>
-        </aside>
+        </div>
+        <nav class="flex flex-col gap-2">
+            <a class="<?= nav_item('dash.php', 'Tableau de bord', $current_page) ?>" href="dash.php">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Tableau de bord</span>
+            </a>
+            <a class="<?= nav_item('mes_visites.php', 'Mes Visites', $current_page) ?>" href="mes_visites.php">
+                <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">map</span>
+                <span>Mes Visites</span>
+            </a>
+            <a class="<?= nav_item('reservations.php', 'Réservations', $current_page) ?>" href="reservations.php">
+                <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">groups</span>
+                <span>Réservations</span>
+            </a>
+        </nav>
+    </div>
+    <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+        <div class="bg-center bg-cover rounded-full h-10 w-10 border-2 border-primary" data-alt="Portrait du guide" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6SweDCChTHrnzUi3ijD-HqKt7FximPeaVPRuHptoZB3gCiNIREev191XH6lCU2g9dWO-0nb19loXauXqO29KxIYeVB8L_qXV7j_z9ew9PCkxmtTGzyhArcCoyjioHHD9oWPKFoA4SKfrqRSRlWptyCfastPtNkgSlFizXCwA60Izfk-CrC13bruBTAOjH610XOUvFB1RnfkoM-IeFW7fkvzAujenUwRWp02gjgWiOhb4zpbuGErPegntLM0188b1Dkbt6DnzndgR5");'></div>
+        <div class="flex flex-col overflow-hidden">
+            <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
+            <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate">Guide <?= $role_utilisateur ?></p>
+        </div>
+    </div>
+</aside>
+
         <main class="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden">
             <div class="lg:hidden flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0 z-20">
                 <span class="material-symbols-outlined text-primary">pets</span>
