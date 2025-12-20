@@ -15,11 +15,10 @@ require_once "../Fonctionalite_php/connect.php";
 $les_visite = [];
 
 
-    $sql = "SELECT * FROM visites_guidees ORDER BY date_heure DESC";
+    $sql = "SELECT vg.*,res.nb_personnes FROM visites_guidees vg left join reservations res on res.id_visite = vg.id ORDER BY date_heure DESC";
     $res = $connect->query($sql);
 
     if ($res) {
-
         $les_visite = $res->fetch_all(MYSQLI_ASSOC);
     }
 
@@ -258,14 +257,14 @@ $les_visite = [];
                                             </div>
                                             <div class="flex items-center gap-2 border-l border-border-light dark:border-border-dark pl-6">
                                                 <span class="material-symbols-outlined text-primary/70 text-[20px]">group</span>
-                                                <span>12 / 20 Participants</span>
+                                                <span><?= ($visite['nb_personnes']?: 0). "/" .$visite['capacite_max']?></span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t border-border-light dark:border-border-dark/50">
                                         <div class="flex gap-2">
-                                            <a href="visite_details.php?id=ID" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all">
+                                            <a href="visite_details.php?id=<?= $visite['id'] ?>" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all">
                                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                                                 Gérer la visite
                                             </a>

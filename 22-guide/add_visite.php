@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 <html class="light" lang="fr">
@@ -14,42 +13,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    primary: "#0d9488",          // Teal واعر مودرن
-                    "primary-dark": "#0f766e",
-                    "primary-light": "#2dd4bf",
-                    "background-light": "#f0fdfa",
-                    "background-dark": "#042f2e",
-                    "surface-light": "#ffffff",
-                    "surface-dark": "#134e4a",
-                    "text-light": "#164e63",
-                    "text-dark": "#a7f3d0",
-                    "text-secondary-light": "#0891b2",
-                    "text-secondary-dark": "#5eead4",
-                    "accent": "#f59e0b"          // لمسة ذهبية
-                },
-                fontFamily: {
-                    sans: ["Plus Jakarta Sans", "sans-serif"]
-                },
-                animation: {
-                    'fade-in': 'fadeIn 0.7s ease-out forwards',
-                    'slide-up': 'slideUp 0.8s ease-out forwards',
-                    'pulse-glow': 'pulseGlow 2s infinite'
-                },
-                keyframes: {
-                    fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                    slideUp: { '0%': { transform: 'translateY(60px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                    pulseGlow: { '0%, 100%': { boxShadow: '0 0 20px rgba(13,148,136,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(13,148,136,0.6)' } }
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0d9488", // Teal واعر مودرن
+                        "primary-dark": "#0f766e",
+                        "primary-light": "#2dd4bf",
+                        "background-light": "#f0fdfa",
+                        "background-dark": "#042f2e",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#134e4a",
+                        "text-light": "#164e63",
+                        "text-dark": "#a7f3d0",
+                        "text-secondary-light": "#0891b2",
+                        "text-secondary-dark": "#5eead4",
+                        "accent": "#f59e0b" // لمسة ذهبية
+                    },
+                    fontFamily: {
+                        sans: ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.7s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 2s infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': {
+                                opacity: '0'
+                            },
+                            '100%': {
+                                opacity: '1'
+                            }
+                        },
+                        slideUp: {
+                            '0%': {
+                                transform: 'translateY(60px)',
+                                opacity: '0'
+                            },
+                            '100%': {
+                                transform: 'translateY(0)',
+                                opacity: '1'
+                            }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': {
+                                boxShadow: '0 0 20px rgba(13,148,136,0.3)'
+                            },
+                            '50%': {
+                                boxShadow: '0 0 40px rgba(13,148,136,0.6)'
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-</script>
+    </script>
     <style>
         .material-symbols-outlined {
             font-variation-settings:
@@ -123,127 +145,67 @@
                     <p class="text-text-sec-light dark:text-text-sec-dark text-lg">Planifiez et publiez une nouvelle expérience virtuelle pour les visiteurs.</p>
                 </div>
 
-                <?php if ($success_message): ?>
-                    <div class="p-4 bg-green-100 dark:bg-green-900/40 border border-green-300 dark:border-green-700/50 text-green-700 dark:text-green-300 rounded-lg flex items-start gap-3" role="alert">
-                        <span class="material-symbols-outlined text-green-700 dark:text-green-300">check_circle</span>
-                        <p class="text-sm font-medium"><?= $success_message ?></p>
-                    </div>
-                <?php endif; ?>
-                <?php if ($error_message): ?>
-                    <div class="p-4 bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-700/50 text-red-700 dark:text-red-300 rounded-lg flex items-start gap-3" role="alert">
-                        <span class="material-symbols-outlined text-red-700 dark:text-red-300">error</span>
-                        <p class="text-sm font-medium"><?= $error_message ?></p>
-                    </div>
-                <?php endif; ?>
+     
+                <form method="POST" action="ajoute.php" enctype="multipart/form-data" class="flex flex-col gap-8 bg-white dark:bg-gray-800 rounded-xl border p-6 shadow-xl">
+    
+    <div class="flex flex-col gap-5">
+        <h3 class="text-2xl font-bold text-green-600 border-b pb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined">description</span>
+            Détails de la Nouvelle Visite
+        </h3>
 
-                <form method="POST" action="add_visite.php" enctype="multipart/form-data" class="flex flex-col gap-8 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-xl p-6 md:p-8">
+        <div>
+            <label class="block text-sm font-medium mb-1">Titre de la Visite <span class="text-red-500">*</span></label>
+            <input type="text" name="titre" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="Ex: Safari Lions">
+        </div>
 
-                    <div class="flex flex-col gap-5">
-                        <h3 class="text-2xl font-bold text-primary border-b border-border-light dark:border-border-dark pb-2 flex items-center gap-2">
-                            <span class="material-symbols-outlined">description</span>
-                            Détails de la Visite
-                        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Langue <span class="text-red-500">*</span></label>
+                <select name="langue" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="Français">Français</option>
+                    <option value="Arabe">Arabe</option>
+                    <option value="Anglais">Anglais</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Prix (DH) <span class="text-red-500">*</span></label>
+                <input type="number" step="0.01" name="prix" required class="w-full px-4 py-2 border rounded-lg" placeholder="0.00">
+            </div>
+        </div>
+    </div>
 
-                        <div>
-                            <label for="title" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Titre de la Visite <span class="text-red-500">*</span></label>
-                            <input type="text" id="title" name="title" value="<?= htmlspecialchars($tour_default['title']) ?>" required
-                                class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark text-lg font-semibold" placeholder="Ex: Safari Virtuel au Coucher du Soleil" />
-                        </div>
+    <div class="flex flex-col gap-5">
+        <h3 class="text-2xl font-bold text-green-600 border-b pb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined">schedule</span>
+            Planning
+        </h3>
 
-                        <div>
-                            <label for="description" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Description Détaillée</label>
-                            <textarea id="description" name="description" rows="5"
-                                class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark resize-none" placeholder="Décrivez le contenu, les espèces présentées, et ce que les visiteurs apprendront."><?= htmlspecialchars($tour_default['description']) ?></textarea>
-                            <p class="text-xs text-text-sec-light dark:text-text-sec-dark mt-1">Cette description sera utilisée pour la réservation.</p>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-1">Date et Heure <span class="text-red-500">*</span></label>
+                <input type="datetime-local" name="date_heure" required class="w-full px-4 py-2 border rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Durée (min)</label>
+                <input type="number" name="duree" value="60" class="w-full px-4 py-2 border rounded-lg">
+            </div>
+        </div>
 
-                        <div>
-                            <label for="category" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Catégorie</label>
-                            <select id="category" name="category"
-                                class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark">
-                                <?php foreach ($categories as $cat) : ?>
-                                    <option value="<?= htmlspecialchars($cat) ?>" <?= $tour_default['category'] === $cat ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($cat) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Capacité Maximale <span class="text-red-500">*</span></label>
+            <input type="number" name="capacite_max" value="20" required class="w-full px-4 py-2 border rounded-lg">
+        </div>
+    </div>
 
-                    </div>
-
-                    <div class="flex flex-col gap-5">
-                        <h3 class="text-2xl font-bold text-primary border-b border-border-light dark:border-border-dark pb-2 flex items-center gap-2">
-                            <span class="material-symbols-outlined">schedule</span>
-                            Planning et Logistique
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label for="date" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Date <span class="text-red-500">*</span></label>
-                                <input type="date" id="date" name="date" value="<?= htmlspecialchars($tour_default['date']) ?>" required
-                                    class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark" />
-                            </div>
-
-                            <div>
-                                <label for="time" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Heure <span class="text-red-500">*</span></label>
-                                <input type="time" id="time" name="time" value="<?= htmlspecialchars($tour_default['time']) ?>" required
-                                    class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark" />
-                            </div>
-
-                            <div>
-                                <label for="duration" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Durée (en minutes)</label>
-                                <input type="number" id="duration" name="duration" value="<?= htmlspecialchars($tour_default['duration']) ?>" min="15" max="180"
-                                    class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="link" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Lien de la salle de Visite (Zoom, Teams, etc.) <span class="text-red-500">*</span></label>
-                            <input type="url" id="link" name="link" value="<?= htmlspecialchars($tour_default['link']) ?>" required
-                                class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark" placeholder="https://lien-de-votre-conference.com" />
-                            <p class="text-xs text-text-sec-light dark:text-text-sec-dark mt-1">Ce lien sera envoyé aux participants après confirmation de la réservation.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-5">
-                        <h3 class="text-2xl font-bold text-primary border-b border-border-light dark:border-border-dark pb-2 flex items-center gap-2">
-                            <span class="material-symbols-outlined">settings_input_svideo</span>
-                            Limites et Média
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="max_participants" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Nombre maximum de participants</label>
-                                <input type="number" id="max_participants" name="max_participants" value="<?= htmlspecialchars($tour_default['max_participants']) ?>" min="1" required
-                                    class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-main-light dark:text-text-main-dark" />
-                                <p class="text-xs text-text-sec-light dark:text-text-sec-dark mt-1">Nombre maximal de personnes pouvant s'inscrire à cette visite.</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="image_upload" class="block text-sm font-medium text-text-sec-light dark:text-text-sec-dark mb-1">Image de Couverture</label>
-                            <input type="file" id="image_upload" name="image_upload" accept="image/*" required
-                                class="block w-full text-sm text-text-sec-light dark:text-text-sec-dark
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-primary/10 file:text-primary
-                                hover:file:bg-primary/20" />
-                            <p class="text-xs text-text-sec-light dark:text-text-sec-dark mt-1">L'image sera utilisée pour l'aperçu public de votre visite.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end gap-4 pt-6 border-t border-border-light dark:border-border-dark">
-                        <a href="mes_visites.php" class="flex items-center gap-2 px-6 py-2.5 rounded-lg border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark font-bold hover:bg-border-light dark:hover:bg-surface-dark transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">cancel</span>
-                            <span>Annuler</span>
-                        </a>
-                        <button type="submit" name="create_tour" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg shadow-green-600/30 transition-all transform hover:scale-[1.02]">
-                            <span class="material-symbols-outlined text-[20px]">add_circle</span>
-                            <span>Créer la Visite</span>
-                        </button>
-                    </div>
-                </form>
+    <div class="flex justify-end gap-4 pt-6 border-t">
+        <button type="button" data-bs-dismiss="modal" class="px-6 py-2 border rounded-lg font-bold hover:bg-gray-100 transition">Annuler</button>
+        <button type="submit" name="save_visite" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-transform hover:scale-105">
+            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+            Créer la Visite
+        </button>
+    </div>
+</form>
 
             </div>
         </main>
