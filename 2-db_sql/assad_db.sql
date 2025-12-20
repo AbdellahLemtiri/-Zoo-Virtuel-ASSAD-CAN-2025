@@ -29,7 +29,7 @@ CREATE TABLE utilisateurs (
 );
 
 
-CREATE TABLE visites_guidees (
+CREATE TABLE  visites_guidees (
   id INT AUTO_INCREMENT PRIMARY KEY,
   titre VARCHAR(150) NOT NULL,
   date_heure DATETIME,

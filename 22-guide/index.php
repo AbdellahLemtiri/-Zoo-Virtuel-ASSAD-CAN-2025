@@ -15,13 +15,16 @@ require_once "../Fonctionalite_php/connect.php";
 $les_visite = [];
 
 
-    $sql = "SELECT * FROM visites_guidees ORDER BY date_heure DESC";
-    $res = $connect->query($sql);
+$sql = "SELECT vg.*, vg.id as idvg, SUM(res.nb_personnes) as total_reserved 
+        FROM visites_guidees vg 
+        LEFT JOIN reservations res ON res.id_visite = vg.id 
+        GROUP BY vg.id 
+        ORDER BY vg.date_heure ASC";
+$res = $connect->query($sql);
 
-    if ($res) {
-
-        $les_visite = $res->fetch_all(MYSQLI_ASSOC);
-    }
+if ($res) {
+    $les_visite = $res->fetch_all(MYSQLI_ASSOC);
+}
 
 
 
@@ -117,10 +120,10 @@ $les_visite = [];
 
 <body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-200">
     <div class="flex h-screen w-full overflow-hidden">
-        <?php
+          <?php
 
-        $current_page = basename($_SERVER['PHP_SELF']);
-        ?>
+            $current_page = basename($_SERVER['PHP_SELF']);
+            ?>
 
         <?php
 
@@ -148,11 +151,7 @@ $les_visite = [];
                     </div>
                 </div>
                 <nav class="flex flex-col gap-2">
-                    <a class="<?= nav_item('dash.php', 'Tableau de bord', $current_page) ?>" href="dash.php">
-                        <span class="material-symbols-outlined">dashboard</span>
-                        <span>Tableau de bord</span>
-                    </a>
-                    <a class="<?= nav_item('mes_visites.php', 'Mes Visites', $current_page) ?>" href="mes_visites.php">
+                    <a class="<?= nav_item('index.php', 'Mes Visites', $current_page) ?>" href="index.php">
                         <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">map</span>
                         <span>Mes Visites</span>
                     </a>
@@ -178,10 +177,11 @@ $les_visite = [];
                         <h2 class="text-3xl md:text-5xl font-black tracking-tight text-text-light dark:text-text-dark">Mes Visites</h2>
                         <p class="text-text-secondary-light dark:text-text-secondary-dark text-lg max-w-2xl">Liste complète et gestion de toutes vos visites virtuelles.</p>
                     </div>
-                    <button class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-primary/20 transition-all transform hover:scale-105 active:scale-95">
+                    <a href="fx/add_visite.php"
+                        class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-primary/20 transition-all transform hover:scale-105 active:scale-95">
                         <span class="material-symbols-outlined text-[24px]">add_circle</span>
                         <span>Créer une nouvelle visite</span>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="flex flex-col gap-6">
@@ -196,11 +196,11 @@ $les_visite = [];
                             <span class="px-5 py-2 hover:bg-primary/10 text-text-sec-light dark:text-text-sec-dark rounded-lg font-semibold transition-colors cursor-pointer">Brouillons (1)</span>
                         </div>
                     </div>
-                
-                        <div class="grid grid-cols-1 gap-6">
-                              <?php foreach ($les_visite as $visite) : ?>
-                        <?php echo $visite['id']; ?> 
-                         <div class="group flex flex-col lg:flex-row gap-6 p-5 rounded-3xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
+
+                    <div class="grid grid-cols-1 gap-6">
+                        <?php foreach ($les_visite as $visite) : ?>
+                            <?php echo $visite['id']; ?>
+                            <div class="group flex flex-col lg:flex-row gap-6 p-5 rounded-3xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
                                 <?php
                                 if ($visite['statut'] === "ouverte"): ?>
                                     <div class="h-56 lg:h-48 lg:w-64 rounded-2xl bg-slate-200 dark:bg-slate-800 bg-cover bg-center shrink-0 relative overflow-hidden">
@@ -258,45 +258,45 @@ $les_visite = [];
                                             </div>
                                             <div class="flex items-center gap-2 border-l border-border-light dark:border-border-dark pl-6">
                                                 <span class="material-symbols-outlined text-primary/70 text-[20px]">group</span>
-                                                <span>12 / 20 Participants</span>
+                                                <span><?= ($visite['total_reserved'] ?: 0) . "/" . $visite['capacite_max'] ?></span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t border-border-light dark:border-border-dark/50">
                                         <div class="flex gap-2">
-                                            <a href="visite_details.php?id=ID" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all">
+                                            <a href="visite_details.php?id=<?= $visite['idvg'] ?>" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all">
                                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                                                 Gérer la visite
                                             </a>
-                                            <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                            <a href="fx/visite_edit.php?id=<?= $visite['idvg'] ?>" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                                 <span class="material-symbols-outlined text-[18px]">edit</span>
                                                 Modifier
-                                            </button>
+                                            </a>
                                         </div>
 
-                                        <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 text-xs font-bold transition-colors">
+                                        <a  href="fx/delet.php?id=<?=  $visite['idvg'] ?>" return confirm() class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 text-xs font-bold transition-colors">
                                             <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
                                             Supprimer
-                                        </button>
+                                </a>
                                     </div>
                                 </div>
-                                     <?php if(count($les_visite)===0) :?>
-                            <div class="flex flex-col items-center justify-center p-20 bg-surface-light dark:bg-surface-dark rounded-[2rem] border-2 border-dashed border-border-light dark:border-border-dark mt-4">
-                                <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                                    <span class="material-symbols-outlined text-primary text-5xl">explore_off</span>
-                                </div>
-                                <h4 class="text-2xl font-bold mb-2">Aucune visite pour le moment</h4>
-                                <p class="text-text-secondary-light dark:text-text-secondary-dark text-center max-w-sm mb-8">Vous n'avez pas encore créé de visites guidées. Commencez par en créer une nouvelle !</p>
-                                <button class="text-primary font-bold hover:underline flex items-center gap-2">
-                                    Créer votre première session <span class="material-symbols-outlined">arrow_forward</span>
-                                </button>
+                                <?php if (count($les_visite) === 0) : ?>
+                                    <div class="flex flex-col items-center justify-center p-20 bg-surface-light dark:bg-surface-dark rounded-[2rem] border-2 border-dashed border-border-light dark:border-border-dark mt-4">
+                                        <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                                            <span class="material-symbols-outlined text-primary text-5xl">explore_off</span>
+                                        </div>
+                                        <h4 class="text-2xl font-bold mb-2">Aucune visite pour le moment</h4>
+                                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-center max-w-sm mb-8">Vous n'avez pas encore créé de visites guidées. Commencez par en créer une nouvelle !</p>
+                                        <button class="text-primary font-bold hover:underline flex items-center gap-2">
+                                            Créer votre première session <span class="material-symbols-outlined">arrow_forward</span>
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-               <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                            </div>
-                       
+                        <?php endforeach; ?>
+                    </div>
+
                 </div>
             </div>
         </main>

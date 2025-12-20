@@ -1,6 +1,32 @@
 <?php
-require_once "../Fonctionalite_php/connect.php"
+require_once "../Fonctionalite_php/connect.php";
 
+$id = isset($_GET['id']) ? intval($_GET['id']) : null;
+
+if ($id) {
+    $sql = "SELECT * FROM visites_guidees WHERE id = $id";
+    $res = $connect->query($sql);
+
+    $visite = null;
+    if ($res && $res->num_rows > 0) {
+        $visite = $res->fetch_assoc();
+    }
+
+    $sql2 = "SELECT * FROM etapes_visite WHERE id_visite = $id ORDER BY ordre_etape ASC";
+    $res2 = $connect->query($sql2);
+
+    $les_etapes = [];
+    if ($res2) {
+        $les_etapes = $res2->fetch_all(MYSQLI_ASSOC);
+    }
+
+    $les_utl = [];
+    $sql3 = "SELECT * FROM utilisateurs ut inner join reservations r on r.id_visite = $id WHERE ut.id = r.id_utilisateur ORDER BY ut.nom ";
+    $res = $connect->query($sql3);
+    if ($res) {
+        $les_utl = $res->fetch_all(MYSQLI_ASSOC);
+    }
+}
 ?>
 <!DOCTYPE html>
 
@@ -92,6 +118,25 @@ require_once "../Fonctionalite_php/connect.php"
 
 <body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-200">
     <div class="flex h-screen w-full overflow-hidden">
+     <?php
+
+            $current_page = basename($_SERVER['PHP_SELF']);
+            ?>
+
+        <?php
+
+        function nav_item($href, $label, $current_page)
+        {
+            $is_active = ($current_page == $href);
+
+
+            if ($is_active) {
+                return "flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none transition-all duration-300";
+            } else {
+                return "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 transition-all duration-200 group";
+            }
+        }
+        ?>
         <aside class="hidden lg:flex flex-col w-72 border-r border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark p-6 h-full justify-between">
             <div class="flex flex-col gap-8">
                 <div class="flex items-center gap-3 px-2">
@@ -104,21 +149,13 @@ require_once "../Fonctionalite_php/connect.php"
                     </div>
                 </div>
                 <nav class="flex flex-col gap-2">
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="tableau_de_bord.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">dashboard</span>
-                        <span>Tableau de bord</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary dark:text-primary font-bold" href="mes_visites.php">
-                        <span class="material-symbols-outlined">map</span>
+                    <a class="<?= nav_item('index.php', 'Mes Visites', $current_page) ?>" href="mes_visites.php">
+                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">map</span>
                         <span>Mes Visites</span>
                     </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="reservations.php">
+                    <a class="<?= nav_item('reservations.php', 'Réservations', $current_page) ?>" href="reservations.php">
                         <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">groups</span>
                         <span>Réservations</span>
-                    </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="parametres.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">settings</span>
-                        <span>Paramètres</span>
                     </a>
                 </nav>
             </div>
@@ -126,7 +163,7 @@ require_once "../Fonctionalite_php/connect.php"
                 <div class="bg-center bg-cover rounded-full h-10 w-10 border-2 border-primary" data-alt="Portrait du guide" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6SweDCChTHrnzUi3ijD-HqKt7FximPeaVPRuHptoZB3gCiNIREev191XH6lCU2g9dWO-0nb19loXauXqO29KxIYeVB8L_qXV7j_z9ew9PCkxmtTGzyhArcCoyjioHHD9oWPKFoA4SKfrqRSRlWptyCfastPtNkgSlFizXCwA60Izfk-CrC13bruBTAOjH610XOUvFB1RnfkoM-IeFW7fkvzAujenUwRWp02gjgWiOhb4zpbuGErPegntLM0188b1Dkbt6DnzndgR5");'></div>
                 <div class="flex flex-col overflow-hidden">
                     <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
-                    <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate">Guide <?= htmlspecialchars($role_utilisateur) ?></p>
+                    <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate">Guide <?= $role_utilisateur ?></p>
                 </div>
             </div>
         </aside>
@@ -141,7 +178,7 @@ require_once "../Fonctionalite_php/connect.php"
                 <div class="flex flex-wrap justify-between items-start gap-4 pb-4 border-b border-border-light dark:border-border-dark">
                     <div class="flex flex-col gap-1">
                         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-text-light dark:text-text-dark">Titre de la Visite</h2>
-                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-lg">Détails et gestion de la Visite #ID_HERE</p>
+                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-lg">Détails et gestion de la Visite id = <?= $visite['id'] ?></p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
@@ -175,15 +212,15 @@ require_once "../Fonctionalite_php/connect.php"
                             <ul class="space-y-4">
                                 <li class="flex flex-col gap-1">
                                     <span class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Date & Heure</span>
-                                    <span class="text-sm font-semibold">01 Janvier 2024 à 10:00</span>
+                                    <span class="text-sm font-semibold"><?= $visite['date_heure'] ?></span>
                                 </li>
                                 <li class="flex flex-col gap-1">
                                     <span class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Durée & Langue</span>
-                                    <span class="text-sm font-semibold">60 min | Français</span>
+                                    <span class="text-sm font-semibold"><?= $visite['duree'] . "min | " . $visite['langue']   ?></span>
                                 </li>
                                 <li class="flex flex-col gap-1">
                                     <span class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Prix de la séance</span>
-                                    <span class="text-sm font-bold text-accent">00.00 DH</span>
+                                    <span class="text-sm font-bold text-accent"><?= $visite['prix'] . " dh" ?></span>
                                 </li>
                             </ul>
                         </div>
@@ -197,7 +234,7 @@ require_once "../Fonctionalite_php/connect.php"
                                 <p class="text-[10px] uppercase font-bold opacity-60">Confirmés</p>
                             </div>
                             <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-border-light dark:border-border-dark text-center">
-                                <p class="text-2xl font-black text-accent">00</p>
+                                <p class="text-2xl font-black text-accent"><?= $visite['capacite_max'] ?></p>
                                 <p class="text-[10px] uppercase font-bold opacity-60">Capacité Max</p>
                             </div>
                             <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-border-light dark:border-border-dark text-center">
@@ -219,24 +256,24 @@ require_once "../Fonctionalite_php/connect.php"
                                         <tr class="text-[11px] uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark border-b border-border-light dark:border-border-dark">
                                             <th class="px-6 py-4 font-bold">Visiteur</th>
                                             <th class="px-6 py-4 font-bold text-center">Places</th>
-                                            <th class="px-6 py-4 font-bold text-right">Action</th>
+                                        
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-border-light dark:divide-border-dark">
-                                        <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="px-6 py-4">
-                                                <div class="text-sm font-bold">Nom du Participant</div>
-                                                <div class="text-xs opacity-60">email@exemple.com</div>
-                                            </td>
-                                            <td class="px-6 py-4 text-center">
-                                                <span class="bg-primary/10 text-primary px-2 py-1 rounded-md text-xs font-bold">2</span>
-                                            </td>
-                                            <td class="px-6 py-4 text-right">
-                                                <button class="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors">
-                                                    <span class="material-symbols-outlined text-sm">cancel</span>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        <?php foreach ($les_utl as $utl): ?>
+                                            <tr class="hover:bg-primary/5 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="text-sm font-bold"><?= $utl['nom'] ?></div>
+                                                    <div class="text-xs opacity-60"><?= $utl['email'] ?></div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-md text-xs font-bold"><?= $utl['nb_personnes'] ?></span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                  
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -247,17 +284,19 @@ require_once "../Fonctionalite_php/connect.php"
                                 <span class="material-symbols-outlined text-primary">format_list_numbered</span>
                                 Étapes de la Visite
                             </h3>
-                            <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                    <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-surface-dark text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                                        1
-                                    </div>
-                                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark shadow-sm">
-                                        <div class="font-bold text-primary">Introduction</div>
-                                        <div class="text-xs opacity-70">Description de l'étape...</div>
+                            <?php foreach ($les_etapes as $etp) : ?>
+                                <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+                                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-surface-dark text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                                            <?= $etp['ordre_etape'] ?>
+                                        </div>
+                                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark shadow-sm">
+                                            <div class="font-bold text-primary"><?= $etp['titre_etape'] ?></div>
+                                            <div class="text-xs opacity-70"><?= $etp['description_etape'] ?></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
 
                     </div>
@@ -286,7 +325,6 @@ require_once "../Fonctionalite_php/connect.php"
             const link = this.getAttribute('data-link');
             navigator.clipboard.writeText(link).then(() => {
                 alert('Lien copié dans le presse-papiers !');
-                // Optionnellement, changer le texte du bouton brièvement
                 this.innerHTML = '<span class="material-symbols-outlined text-[20px]">check</span> Copié !';
                 setTimeout(() => {
                     this.innerHTML = '<span class="material-symbols-outlined text-[20px]">content_copy</span> Copier le Lien';
