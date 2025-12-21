@@ -71,7 +71,7 @@
     //             array_push($array_animaux, $ligne);
     //     }
 
-$animaux =[];
+$animaux = [];
 
 $search = $_POST['search'] ?? '';
 $id_habitat = $_POST['id_habitat'] ?? '';
@@ -81,10 +81,11 @@ $sql = "
 SELECT a.*, h.nom as nom_habitat
 FROM animaux a
 LEFT JOIN habitats h ON a.id_habitat = h.id
-
+WHERE 1=1
 ";
 
 if (!empty($search)) {
+    $search = $connect->real_escape_string($search);
     $sql .= " AND a.nom LIKE '%$search%'";
 }
 
@@ -94,14 +95,17 @@ if (!empty($id_habitat)) {
 }
 
 if (!empty($pays)) {
+    $pays = $connect->real_escape_string($pays);
     $sql .= " AND a.pays_origine = '$pays'";
 }
 
 $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
- $res = $connect->query($sql);
- if($res){
-   $animaux = $res->fetch_all(MYSQLI_ASSOC);
- }
+
+$res = $connect->query($sql);
+if ($res) {
+    $animaux = $res->fetch_all(MYSQLI_ASSOC);
+}
+
 ?>
 
 
@@ -258,7 +262,7 @@ $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
              </div>
          </div>
 
-      <form action="" method="POST"
+      <form action="animaux.php" method="POST"
       class="w-full max-w-[1200px] px-4 md:px-10 sticky top-[65px] z-40">
 
   <div class="bg-white/80 backdrop-blur-xl shadow-sm border border-[#f3ede7] rounded-xl p-4 mb-8">
@@ -279,19 +283,32 @@ $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
         />
       </div>
 
-      <!-- 🌿 Habitat + 🌍 Pays -->
+
       <div class="flex gap-4 overflow-x-auto pb-2 md:pb-0 w-full md:w-2/3 scrollbar-hide">
 
-        <select
-          name="id_habitat"
-          class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/3">
-          <option value="">Filtrer par Habitat</option>
-          <option value="1">Savane Africaine</option>
-          <option value="2">Forêt Tropicale</option>
-          <option value="3">Désert</option>
-          <option value="4">Zone Aquatique</option>
-          <option value="5">Montagne</option>
-        </select>
+    <select
+  name="id_habitat"
+  class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/3">
+
+  <option value="">tout</option>
+
+  <?php
+    $sql2 = "SELECT id, nom FROM habitats ORDER BY nom";
+    $res = $connect->query($sql2);
+
+    $habitat = [];
+    if ($res) {
+      $habitat = $res->fetch_all(MYSQLI_ASSOC);
+    }
+
+    foreach ($habitat as $hab):
+
+  ?>
+      <option value="<?= $hab['id'] ?>"><?=  $hab['nom'] ?></option>
+  <?php endforeach; ?>
+
+</select>
+
 
         <select
           name="pays"
@@ -304,7 +321,7 @@ $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
           <option value="Égypte">Égypte</option>
         </select>
 
-        <!-- 🔘 Button -->
+       
         <button
           type="submit"
           class="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md whitespace-nowrap w-full sm:w-1/3">
@@ -330,7 +347,7 @@ $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
                  <!-- Featured (index 0) -->
-                 <div class="group relative flex flex-col bg-white rounded-2xl border-2 border-primary overflow-hidden hover:shadow-xl transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-2">
+                 <!-- <div class="group relative flex flex-col bg-white rounded-2xl border-2 border-primary overflow-hidden hover:shadow-xl transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-2">
                      <div class="absolute top-4 left-4 z-10">
                          <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold shadow-lg">
                              <span class="material-symbols-outlined text-[16px]">stars</span>
@@ -359,8 +376,10 @@ $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
                              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                          </a>
                      </div>
-                 </div>
-
+                 </div> -->
+                <?php if(count($animaux) == 0){
+                    echo "<div>aucun animaux </div>";
+                } ?>
                  <?php foreach ($animaux as $anm): ?>
                      <div class="group flex flex-col bg-white rounded-2xl border border-[#f3ede7] overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                          <a href="animal_detail.php?id=2" class="h-48 overflow-hidden relative">
@@ -403,13 +422,7 @@ $sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
 
              </div>
 
-             <div class="flex justify-center mt-12">
-                 <button
-                     class="flex items-center justify-center gap-2 px-6 py-3 border border-[#e5e5e5] hover:border-primary text-[#1b140d] hover:text-primary font-bold rounded-xl transition-all bg-white hover:bg-orange-50">
-                     Charger plus d'animaux
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
-             </div>
+           
          </div>
      </main>
 

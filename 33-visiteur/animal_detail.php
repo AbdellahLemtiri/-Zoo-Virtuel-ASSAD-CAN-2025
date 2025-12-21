@@ -1,39 +1,28 @@
-<!-- <?php
-
-// $animal_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
-
-// if ($animal_id) {
-
-//     session_start();
-// include "../Fonctionalite_php/connect.php";
-
-    // if (
-        // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-        // $_SESSION['role_utilisateur'] === "visiteur" &&
-        // $_SESSION['logged_in'] === TRUE
-        1
-    // ) {
-        // $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+<?php
+require_once "../Fonctionalite_php/connect.php";
 
 
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $id = intval($_GET['id']);
 
-//         $sql = " SELECT * FROM animaux a INNER JOIN habitats h on a.id_habitat= h.id_habitat and a.id_animal= $animal_id";
-//         $resultat = $conn->query($sql);
+  
+    $sql = "SELECT  a.*, h.nom as habnom, h.type_climat, h.zone_zoo, h.description as description_habitat 
+            FROM animaux a 
+            LEFT JOIN habitats h ON a.id_habitat = h.id
+            WHERE a.id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-//         $animal = $resultat->fetch_assoc();
-//     } else {
-//         header("Location: ../connexion.php?error=access_denied");
-//         exit();
-//     }
-
-//     if (!$animal) {
-//         $error = "Animal non trouvé.";
-//     }
-// } else {
-//     $error = "ID d'animal manquant.";
-// } 
+    if ($result->num_rows > 0) {
+        $animal = $result->fetch_assoc();
+    } 
+} else {
+    header("Location: animaux.php");
+    exit();
+}
 ?>
-
 <!DOCTYPE html>
 <html class="light" lang="fr">
 
@@ -53,7 +42,7 @@
         theme: {
             extend: {
                 colors: {
-                    primary: "#0d9488",          // Teal واعر مودرن
+                    primary: "#0d9488",         
                     "primary-dark": "#0f766e",
                     "primary-light": "#2dd4bf",
                     "background-light": "#f0fdfa",
@@ -64,7 +53,7 @@
                     "text-dark": "#a7f3d0",
                     "text-secondary-light": "#0891b2",
                     "text-secondary-dark": "#5eead4",
-                    "accent": "#f59e0b"          // لمسة ذهبية
+                    "accent": "#f59e0b"        
                 },
                 fontFamily: {
                     sans: ["Plus Jakarta Sans", "sans-serif"]
@@ -125,84 +114,90 @@
     </header>
 
     <main class="flex-grow flex flex-col items-center py-10">
-        <div class="w-full max-w-[1200px] px-4 md:px-10">
-            <?php if (isset($error)): ?>
-                <div class="p-6 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg">
-                    <h2 class="font-bold text-xl mb-2">Erreur d'accès</h2>
-                    <p><?= $error ?></p>
-                    <a href="index.php" class="text-sm font-medium underline mt-2 inline-block">Retourner à la liste des animaux</a>
-                </div>
-            <?php else: ?>
-                <div class="mb-8">
-                    <a href="./animaux.php" class="flex items-center gap-1 text-primary hover:text-orange-600 text-sm font-bold transition-colors mb-4">
-                        <span class="material-symbols-outlined text-lg">arrow_back</span>
-                        Retour à la liste des animaux
-                    </a>
-                </div>
+    <div class="w-full max-w-[1200px] px-4 md:px-10">
+      
+            <div class="mb-8">
+                <a href="animaux.php" class="flex items-center gap-1 text-primary hover:text-primary-dark text-sm font-bold transition-colors mb-4 group">
+                    <span class="material-symbols-outlined text-lg group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    Retour à la liste des animaux
+                </a>
+            </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    <div class="lg:col-span-2 flex flex-col gap-6">
-
-                        <div class="h-[450px] rounded-xl overflow-hidden relative shadow-2xl shadow-primary/20">
-                            <img alt="<?= $animal['nom_animal'] ?>"
-                                class="w-full h-full object-cover"
-                                src="<?= htmlspecialchars($animal['image_url']) ?>" />
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-6 left-6 text-white">
-                                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-sm font-bold shadow-lg mb-2">
-                                    <span class="material-symbols-outlined text-[18px]">stars</span>
-                                    <?= htmlspecialchars($animal['alimentation_animal']) ?>
-                                </span>
-                                <h1 class="text-5xl font-black tracking-tight drop-shadow-lg"><?= htmlspecialchars($animal['nom_animal']) ?></h1>
-                                <p class="text-xl text-white/90 italic font-medium mt-1 drop-shadow-md"><?= htmlspecialchars($animal['espece']) ?></p>
-                            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 flex flex-col gap-6">
+                    <div class="h-[450px] md:h-[550px] rounded-2xl overflow-hidden relative shadow-2xl shadow-primary/20 animate-fade-in">
+                        <img alt="<?=$animal['nom'] ?>"
+                             class="w-full h-full object-cover"
+                             src="<?= $animal['image'] ?>" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 text-white">
+                            <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-sm font-bold shadow-lg mb-3">
+                                <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                                <?=$animal['alimentation'] ?>
+                            </span>
+                            <h1 class="text-5xl md:text-6xl font-black tracking-tight drop-shadow-lg"><?= htmlspecialchars($animal['nom']) ?></h1>
+                            <p class="text-2xl text-white/90 italic font-medium mt-2 drop-shadow-md"><?= htmlspecialchars($animal['espece']) ?></p>
                         </div>
-
-
-
                     </div>
-
-                    <div class="lg:col-span-1 flex flex-col gap-6">
-
-
-                        <div class="bg-white p-6 rounded-xl shadow-lg border border-[#f3ede7]">
-                            <h2 class="text-2xl font-bold text-primary mb-4 border-b border-gray-100 pb-2">À Propos de <?= htmlspecialchars($animal['nom_animal']) ?></h2>
-                            
-                            <div class="flex flex-wrap gap-4 mt-2 pt-2  border-gray-100">
-                                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 text-orange-600 text-sm font-bold">
-                                    <span class="material-symbols-outlined text-lg">public</span>
-                                    <?= htmlspecialchars($animal['pays_origine']) ?>
-                                </span>
-                                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-sm font-bold">
-                                    <span class="material-symbols-outlined text-lg">eco</span>
-                                    <?= htmlspecialchars($animal['nom_habitat']) ?>
-                                </span>
-                            </div>
-                            <p class="text-gray-700 leading-relaxed border-b  m-2 p-2"><?= htmlspecialchars($animal['description_animal']) ?></p>
-
-
-
-                            <p class="text-gray-700 leading-relaxed"> </p>
-
-                            <ul class="space-y-3 text-sm text-gray-700">
-                                <li class="flex justify-between items-center"><span class="font-medium">Nom  :</span> <span class="italic"><?= htmlspecialchars($animal['nom_animal']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Régime :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['alimentation_animal']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Habitat :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['nom_habitat']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Type de climat :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['type_climat']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> zone :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['zone_zoo']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Description d'habitat :</span> <span class="w-1/2 text-right"> </span></li>
-                            </ul>
-                            <p class="text-gray-700 leading-relaxed"><?= htmlspecialchars($animal['description_habitat']) ?></p>
-                        </div>
-
-
-
+                    
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-[#f3ede7]">
+                        <h3 class="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined">description</span>
+                            Description détaillée
+                        </h3>
+                        <p class="text-gray-700 leading-relaxed text-lg">
+                            <?= $animal['description_courte'] ?>
+                        </p>
                     </div>
                 </div>
-            <?php endif; ?>
-        </div>
-    </main>
+
+                <div class="lg:col-span-1 flex flex-col gap-6 animate-slide-up">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-[#f3ede7] sticky top-24">
+                        <h2 class="text-2xl font-bold text-primary mb-6 border-b border-gray-100 pb-4">Fiche d'identité</h2>
+                        
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 text-xs font-bold border border-orange-100">
+                                <span class="material-symbols-outlined text-sm">public</span>
+                                <?= $animal['pays_origine'] ?>
+                            </span>
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 text-teal-600 text-xs font-bold border border-teal-100">
+                                <span class="material-symbols-outlined text-sm">home_pin</span>
+                                <?= $animal['habnom'] ?>
+                            </span>
+                        </div>
+
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex flex-col gap-1 p-3 rounded-xl bg-gray-50/50">
+                                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Régime Alimentaire</span>
+                                <span class="text-gray-800 font-semibold"><?= $animal['alimentation'] ?></span>
+                            </li>
+                            <li class="flex flex-col gap-1 p-3 rounded-xl bg-gray-50/50">
+                                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Habitat & Climat</span>
+                                <span class="text-gray-800 font-semibold"><?= $animal['habnom'] ?> (<?= $animal['type_climat'] ?>)</span>
+                            </li>
+                            <li class="flex flex-col gap-1 p-3 rounded-xl bg-gray-50/50">
+                                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Zone du Zoo</span>
+                                <span class="text-gray-800 font-semibold"><?= $animal['zone_zoo'] ?></span>
+                            </li>
+                        </ul>
+
+                        <div class="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                            <h4 class="text-sm font-bold text-primary mb-2 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">info</span>
+                                À propos de l'habitat
+                            </h4>
+                            <p class="text-sm text-gray-600 leading-relaxed italic">
+                                "<?= $animal['description_habitat'] ?>"
+                            </p>
+                        </div>
+                        
+                      
+                    </div>
+                </div>
+            </div>
+   
+    </div>
+</main>
 
     <footer class="bg-[#1b140d] text-white pt-16 pb-8 mt-auto">
         <div class="max-w-[1200px] mx-auto px-4 md:px-10">

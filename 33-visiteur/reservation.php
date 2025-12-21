@@ -73,7 +73,24 @@
 
 
 
- 
+
+$sql_guides = "SELECT id, nom FROM utilisateurs WHERE role = 'Guide' AND approuve = 1";
+$res_guides = $connect->query($sql_guides);
+$array_guides = $res_guides->fetch_all(MYSQLI_ASSOC);
+
+$where_clause = "WHERE v.statut = 'disponible'"; 
+
+$sql_visites = "SELECT v.*, 
+                (v.capacite_max - COALESCE(SUM(r.nbpersonnes), 0)) AS places_restantes
+                FROM visitesguidees v
+                LEFT JOIN reservations r ON v.id_visite = r.idvisite
+                $where_clause
+                GROUP BY v.id_visite
+                ORDER BY v.dateheure ASC";
+
+$res_visites = $connect->query($sql_visites);
+$array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
+
     ?>
 
  <!DOCTYPE html>
@@ -151,136 +168,66 @@
          </div>
      </header>
 
-     <main class="flex-grow flex flex-col items-center py-10">
-         <div class="w-full max-w-[1200px] mx-auto px-4 md:px-10">
+ <?php foreach ($array_visites as $visit) : 
+    $date_visite = strtotime($visit['dateheure']); 
+    $maintenant = time();
+    $places_restantes = $visit['places_restantes'];
+    $is_full = $places_restantes <= 0;
+?>
+    <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-white border border-[#f3ede7] shadow-md hover:shadow-lg transition-all <?= $is_full ? 'opacity-75 grayscale' : '' ?>">
+        
+        <div class="h-48 sm:h-auto sm:w-48 rounded-xl bg-cover bg-center shrink-0 relative bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-4xl text-primary/30">map</span>
+            
+            <?php if ($date_visite <= $maintenant && $date_visite > ($maintenant - 3600)) : ?>
+                <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-lg items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> En direct
+                </div>
+            <?php elseif ($date_visite > $maintenant) : ?>
+                <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded-lg items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">schedule</span> Programmé
+                </div>
+            <?php endif; ?>
+        </div>
 
-             <div class="w-full mb-10">
-                 <div
-                     class="rounded-xl overflow-hidden relative min-h-[250px] flex flex-col justify-center items-center text-center p-8 bg-cover bg-center shadow-xl shadow-primary/10 bg-green-900/90">
-                     <span
-                         class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-bold uppercase tracking-wider mb-4">
-                         <span class="material-symbols-outlined text-base">live_tv</span>
-                         Immersion garantie
-                     </span>
-                     <h1
-                         class="text-white text-4xl md:text-5xl font-black leading-tight tracking-tight mb-4 max-w-3xl drop-shadow-lg">
-                         Réservez Votre Visite Guidée Virtuelle
-                     </h1>
-                     <p class="text-white/90 text-base md:text-lg font-medium max-w-2xl drop-shadow-md">
-                         Rencontrez nos guides experts et explorez la faune comme jamais auparavant, en temps réel.
-                     </p>
-                 </div>
-             </div>
+        <div class="flex flex-col justify-between flex-1 gap-4">
+            <div>
+                <h4 class="text-xl font-bold mb-1 text-[#1b140d]"><?= htmlspecialchars($visit['titre']) ?></h4>
+                <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
+                        <span><?= date('d M Y, H:i', $date_visite) ?></span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-primary text-[18px]">group</span>
+                        <span class="<?= $is_full ? 'text-red-500' : '' ?>">
+                            <?= $is_full ? 'Complet' : $places_restantes . ' places dispo.' ?>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
+                        <span class="font-bold text-green-600"><?= number_format($visit['prix'], 2) ?> DH</span>
+                    </div>
+                </div>
+            </div>
 
-             <section id="reservations" class="mb-16">
-                 <h2 class="text-3xl font-extrabold text-[#1b140d] mb-8 text-center border-b border-primary/20 pb-4">Sessions Disponibles</h2>
+            <div class="flex flex-wrap gap-3 mt-auto pt-2 border-t border-gray-100">
+                <a href="visite_details.php?id=<?= $visit['id_visite'] ?>" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">visibility</span> Détails
+                </a>
 
-                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-white rounded-xl shadow-lg border border-[#f3ede7] mb-8">
-                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
-                       
-                     </div>
-                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-                         <button class=" ">
-                             <span class="material-symbols-outlined text-gray-400 group-focus-within:text-primary transition-colors">search</span>
-
-                         </button>
-                         <input type="date" value="<?= date('Y-m-d') ?>" class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-primary focus:border-primary w-full" />
-
-                         <select class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-primary focus:border-primary w-full">
-                             <option value="">Par Guide</option>
-                             <?php  foreach($array_guides as $quide): ?>
-                             <option value="<?= $quide["id_utilisateur"] ?>"><?= $quide["nom_utilisateur"] ?></option>
-
-                             <?php endforeach?>
-                             
-                         </select>
-                     </div>
-                 </div>
-                 <div class="space-y-6">
-                     <?php foreach ($array_visites as $visit) :
-
-                            $date_visite = strtotime($visit['dateheure_viste']);
-                            $maintenant = time();
-                            $is_full = 11 <= 0;
-                        ?>
-                         <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-white dark:bg-zinc-800 border border-[#f3ede7] dark:border-zinc-700 shadow-md hover:shadow-lg transition-shadow duration-300 <?= $is_full ? 'opacity-75' : '' ?>">
-
-                             <div class="h-48 sm:h-auto sm:w-48 rounded-xl bg-cover bg-center shrink-0 relative bg-gray-200"
-                                 style="background-image: url('../assets/img/habitats/<?= $visit['id_habitat'] ?? 'default' ?>.jpg');">
-
-                                 <?php if ($date_visite <= $maintenant && $date_visite > ($maintenant - 3600)) : ?>
-                                     <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
-                                         <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                                         En direct
-                                     </div>
-                                 <?php elseif ($date_visite > $maintenant) : ?>
-                                     <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
-                                         <span class="material-symbols-outlined text-[14px] leading-none">schedule</span>
-                                         Programmé
-                                     </div>
-                                 <?php else : ?>
-                                     <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-gray-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
-                                         Terminé
-                                     </div>
-                                 <?php endif; ?>
-                             </div>
-
-                             <div class="flex flex-col justify-between flex-1 gap-4">
-                                 <div>
-                                     <h4 class="text-xl font-bold mb-1 hover:text-primary transition-colors cursor-pointer text-[#1b140d] dark:text-white">
-                                         <?= htmlspecialchars($visit['titre_visite']) ?>
-                                     </h4>
-                                     <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                                         <?= htmlspecialchars($visit['description_visite']) ?>.
-
-                                     </p>
-
-                                     <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
-                                         <div class="flex items-center gap-1">
-                                             <span class="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
-                                             <span><?= date('d M Y, H:i', $date_visite) ?></span>
-                                         </div>
-                                         <div class="flex items-center gap-1">
-                                             <span class="material-symbols-outlined text-primary text-[18px]">group</span>
-                                             <span><?= $is_full ? 'Complet' : '11 places dispo.' ?></span>
-                                         </div>
-                                         <div class="flex items-center gap-1">
-                                             <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
-                                             <span class="font-bold text-green-600"><?= htmlspecialchars($visit['prix__visite']) ?>€</span>
-                                         </div>
-                                     </div>
-                                 </div>
-
-                                 <div class="flex flex-wrap gap-3 mt-auto pt-2 border-t border-gray-100 dark:border-zinc-700">
-                                     <a href="visite_details.php?id=<?= $visit['id_visite'] ?>" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors">
-                                         <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                         Détails
-                                     </a>
-
-                                     <?php if (!$is_full) : ?>
-                                         <button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
-                                             <span class="material-symbols-outlined text-[18px]">confirmation_number</span>
-                                             Réserver
-                                         </button>
-                                     <?php endif; ?>
-
-
-                                 </div>
-                             </div>
-                         </div>
-                     <?php endforeach; ?>
-
-                     <?php if (empty($array_visites)): ?>
-                         <div class="p-10 text-center bg-white rounded-2xl shadow-sm border border-dashed border-gray-300">
-                             <span class="material-symbols-outlined text-5xl text-gray-300 mb-2">search_off</span>
-                             <p class="text-gray-500 text-lg">Aucune visite disponible pour le moment.</p>
-                         </div>
-                     <?php endif; ?>
-                 </div>
-
-             </section>
-         </div>
-     </main>
+                <?php if (!$is_full && isset($_SESSION['user_id'])) : ?>
+                    <button onclick="openBookingModal(<?= $visit['id_visite'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-orange-600 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">confirmation_number</span> Réserver
+                    </button>
+                <?php elseif (!$is_full): ?>
+                    <a href="login.php" class="text-xs text-primary underline">Connectez-vous pour réserver</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
 
      <footer class="bg-[#1b140d] text-white pt-16 pb-8 mt-auto">
          <div class="max-w-[1200px] mx-auto px-4 md:px-10">

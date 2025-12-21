@@ -1,6 +1,6 @@
 <?php
 
-include "../db_connect.php";
+require_once "connect.php";
 
 if (
     $_SERVER['REQUEST_METHOD'] === "POST" &&
@@ -28,7 +28,7 @@ if (
 
     $stmt->close();
 } else {
-    
+
     header("Location: ../connexion.php?error=1");
     exit();
 

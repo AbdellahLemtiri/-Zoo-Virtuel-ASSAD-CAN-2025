@@ -16,7 +16,7 @@
         theme: {
             extend: {
                 colors: {
-                    primary: "#0d9488",          // Teal واعر مودرن
+                    primary: "#0d9488",
                     "primary-dark": "#0f766e",
                     "primary-light": "#2dd4bf",
                     "background-light": "#f0fdfa",
@@ -27,7 +27,7 @@
                     "text-dark": "#a7f3d0",
                     "text-secondary-light": "#0891b2",
                     "text-secondary-dark": "#5eead4",
-                    "accent": "#f59e0b"          // لمسة ذهبية
+                    "accent": "#f59e0b"       
                 },
                 fontFamily: {
                     sans: ["Plus Jakarta Sans", "sans-serif"]
