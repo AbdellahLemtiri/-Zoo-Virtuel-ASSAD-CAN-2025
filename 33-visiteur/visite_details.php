@@ -1,10 +1,9 @@
 <?php
-session_start();
 require_once "../Fonctionalite_php/auth_check.php";
-protect_page('guide'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+protect_page('visiteur'); 
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
 require_once "../Fonctionalite_php/connect.php";
 
@@ -42,7 +41,7 @@ if ($id) {
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Détails : <?= htmlspecialchars($tour['title']) ?> - ASSAD</title>
+    <title>Détails : <?=  ($tour['title']) ?> - ASSAD</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />

@@ -1,32 +1,29 @@
 <?php
 require_once "../Fonctionalite_php/auth_check.php";
 protect_page('admin'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
-        echo $_SESSION['nom'];
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
+    
 require_once 'fx/connect.php';
 
 $query = "SELECT id, nom, email, role, approuve FROM utilisateurs";
 $result = mysqli_query($connect, $query);
 
-// Fonction pour activer/désactiver un utilisateur
 if (isset($_GET['toggle_status'])) {
     $user_id = $_GET['toggle_status'];
     
-    // Récupérer l'état actuel de l'utilisateur
     $status_query = "SELECT approuve FROM utilisateurs WHERE id = $user_id";
     $status_result = mysqli_query($connect, $status_query);
     $user = mysqli_fetch_assoc($status_result);
 
-    // Inverser l'état (si approuve == 1, mettre à 0, sinon mettre à 1)
+ 
     $new_status = ($user['approuve'] == 1) ? 0 : 1;
-    
-    // Mettre à jour le statut dans la base de données
+   
     $update_query = "UPDATE utilisateurs SET approuve = $new_status WHERE id = $user_id";
     mysqli_query($connect, $update_query);
     
-    // Rediriger après la mise à jour
+  
     header("Location: admin_users.php");
     exit;
 }
@@ -122,7 +119,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
             <nav class="flex flex-col gap-2">
                 
-              <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
+              <a href="index.php" class="<?= nav_item('index.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span class="text-sm font-semibold">Vue d'ensemble</span>
                 </a>
@@ -190,20 +187,7 @@ function nav_item($href, $icon, $label, $current_page) {
         <div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
             <div class="max-w-7xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
                 
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <div class="flex flex-wrap gap-3">
-                        <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (?>)</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Guides ()</button>
-                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Visiteurs ()</button>
-                    </div>
-                    <div class="relative w-full md:w-auto">
-                        <span
-                            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
-                        <input
-                            class="pl-8 pr-3 py-1.5 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm w-full md:w-64 focus:ring-primary/20 focus:border-primary"
-                            placeholder="Rechercher par nom ou email..." type="text" />
-                    </div>
-                </div>
+
 
                 <div
                     class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">

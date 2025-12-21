@@ -1,4 +1,11 @@
+<?php 
+require_once "../../Fonctionalite_php/auth_check.php";
+protect_page('guide'); 
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
+?>
     <!DOCTYPE html>
 
     <html class="light" lang="fr">
@@ -90,10 +97,8 @@
     <body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-200">
         <div class="flex h-screen w-full overflow-hidden">
                <?php
-
             $current_page = basename($_SERVER['PHP_SELF']);
             ?>
-
         <?php
 
         function nav_item($href, $label, $current_page)
@@ -103,7 +108,8 @@
 
             if ($is_active) {
                 return "flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none transition-all duration-300";
-            } else {
+            } 
+            else {
                 return "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 transition-all duration-200 group";
             }
         }
@@ -157,7 +163,7 @@
                     </div>
 
 
-                    <form method="POST" action="add_visite.php" enctype="multipart/form-data" class="flex flex-col gap-8 bg-white dark:bg-gray-800 rounded-xl border p-6 shadow-xl">
+                    <form method="POST" action="add.php" enctype="multipart/form-data" class="flex flex-col gap-8 bg-white dark:bg-gray-800 rounded-xl border p-6 shadow-xl">
 
                         <div class="flex flex-col gap-5">
                             <h3 class="text-2xl font-bold text-green-600 border-b pb-2 flex items-center gap-2">
@@ -208,6 +214,28 @@
                                 <input type="number" name="capacite_max" value="20" required class="w-full px-4 py-2 border rounded-lg">
                             </div>
                         </div>
+<div class="flex flex-col gap-5 mt-4">
+    <h3 class="text-2xl font-bold text-teal-600 border-b pb-2 flex items-center gap-2">
+        <span class="material-symbols-outlined">route</span>
+        Étapes du Parcours 
+    </h3>
+    
+    <div id="etapes-container" class="flex flex-col gap-4">
+        <div class="etape-item p-4 border rounded-xl bg-gray-50 dark:bg-gray-700/30 flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-sm text-teal-600">Étape 1</span>
+            </div>
+            <input type="text" name="etape_titre[]" placeholder="Titre de l'étape (ex: Enclos des Girafes)" class="w-full px-4 py-2 border rounded-lg">
+            <textarea name="etape_desc[]" placeholder="Description de l'étape..." class="w-full px-4 py-2 border rounded-lg rows-2"></textarea>
+        </div>
+    </div>
+
+    <button type="button" onclick="ajouterEtape()" class="flex items-center justify-center gap-2 py-2 border-2 border-dashed border-teal-500 text-teal-600 rounded-xl hover:bg-teal-50 transition">
+        <span class="material-symbols-outlined">add</span>
+        Ajouter une autre étape
+    </button>
+</div>
+
 
                         <div class="flex justify-end gap-4 pt-6 border-t">
                             <button type="button" data-bs-dismiss="modal" class="px-6 py-2 border rounded-lg font-bold hover:bg-gray-100 transition">Annuler</button>
@@ -221,6 +249,25 @@
                 </div>
             </main>
         </div>
+        <script>
+let etapeCount = 1;
+function ajouterEtape() {
+    etapeCount++;
+    const container = document.getElementById('etapes-container');
+    const html = `
+        <div class="etape-item p-4 border rounded-xl bg-gray-50 dark:bg-gray-700/30 flex flex-col gap-3 animate-slide-up">
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-sm text-teal-600">Étape ${etapeCount}</span>
+                <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </div>
+            <input type="text" name="etape_titre[]" placeholder="Titre de l'étape" class="w-full px-4 py-2 border rounded-lg">
+            <textarea name="etape_desc[]" placeholder="Description de l'étape..." class="w-full px-4 py-2 border rounded-lg rows-2"></textarea>
+        </div>`;
+    container.insertAdjacentHTML('beforeend', html);
+}
+</script>
     </body>
 
     </html>

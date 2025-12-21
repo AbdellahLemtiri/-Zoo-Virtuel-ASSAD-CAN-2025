@@ -1,9 +1,9 @@
-<?php session_start();
+<?php 
 require_once "../Fonctionalite_php/auth_check.php";
 protect_page('admin'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
  ?>
 
 <!DOCTYPE html>
@@ -88,7 +88,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
             <nav class="flex flex-col gap-2">
                 
-               <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
+               <a href="index.php" class="<?= nav_item('index.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span class="text-sm font-semibold">Vue d'ensemble</span>
                 </a>
@@ -129,7 +129,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         <p class="text-[11px] text-slate-400 font-medium italic">Super Admin</p>
                     </div>
                 </div>
-                <a href="logout.php" title="Déconnexion" class="text-slate-400 hover:text-red-500 transition-colors">
+                <a href="index.php" title="Déconnexion" class="text-slate-400 hover:text-red-500 transition-colors">
                     <span class="material-symbols-outlined text-xl">logout</span>
                 </a>
             </div>
@@ -195,8 +195,8 @@ function nav_item($href, $icon, $label, $current_page) {
                                     class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-light dark:text-text-dark">
                                     <option value="" disabled selected>Sélectionner un type</option>
                                     <?php foreach ($habitat_types as $type) : ?>
-                                        <option value="<?= htmlspecialchars($type) ?>">
-                                            <?= htmlspecialchars($type) ?>
+                                        <option value="<?=  ($type) ?>">
+                                            <?=  ($type) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -223,8 +223,8 @@ function nav_item($href, $icon, $label, $current_page) {
                                     class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-background-light dark:bg-surface-dark/50 focus:border-primary focus:ring-primary text-text-light dark:text-text-dark">
                                     <option value="" disabled selected>Affecter un guide</option>
                                     <?php foreach ($guides as $guide) : ?>
-                                        <option value="<?= htmlspecialchars($guide['id']) ?>">
-                                            <?= htmlspecialchars($guide['name']) ?>
+                                        <option value="<?=  ($guide['id']) ?>">
+                                            <?=  ($guide['name']) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>

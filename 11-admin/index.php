@@ -1,13 +1,14 @@
 <?php
-session_start();
-require_once "../Fonctionalite_php/auth_check.php";
-protect_page('admin'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+require_once "fx/connect.php";
 
-$nom_utilisateur = htmlspecialchars($_SESSION['nom'] ?? 'Admin');
-$current_page = basename($_SERVER['PHP_SELF']);
+require_once "../Fonctionalite_php/auth_check.php";
+
+protect_page('admin'); 
+
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
+
 ?>
 
 <!DOCTYPE html>
@@ -58,18 +59,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </head>
 <body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans antialiased min-h-screen flex overflow-hidden">
     <?php
-// On détecte la page actuelle pour allumer le bon bouton
+
 $current_page = basename($_SERVER['PHP_SELF']);
 
-// Fonction pour générer les styles dynamiquement
 function nav_item($href, $icon, $label, $current_page) {
     $is_active = ($current_page == $href);
     
-    // Classes si le lien est ACTIF
+
     if ($is_active) {
         return "flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none transition-all duration-300";
     } 
-    // Classes si le lien est INACTIF (avec Hover)
     else {
         return "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 transition-all duration-200 group";
     }
@@ -92,7 +91,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
             <nav class="flex flex-col gap-2">
                 
-              <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
+              <a href="index.php" class="<?= nav_item('index.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span class="text-sm font-semibold">Vue d'ensemble</span>
                 </a>
@@ -174,9 +173,30 @@ function nav_item($href, $icon, $label, $current_page) {
         <div class="absolute top-0 right-0 w-32 h-32 bg-primary-light/20 rounded-full blur-3xl group-hover:blur-4xl transition-all"></div>
         
         <div class="relative z-10 p-8 flex flex-col items-start">
-            <span class="material-symbols-outlined text-6xl text-primary-light mb-6 group-hover:text-primary group-hover:scale-110 transition-all duration-500">pets</span>
+               <?php $sql = "SELECT count(*) as nbranimuax FROM animaux  " ;
+              $res = $connect->query($sql);
+              if($res) {
+                $nbranm = $res->fetch_assoc()['nbranimuax'];
+              }
+              $sql = "SELECT count(*) as nbrsavan FROM animaux a inner join habitats h on a.id = h.id WHERE h.nom = 'Savane Africaine' " ;
+              $res = $connect->query($sql);
+              if($res) {
+                $nbrsavan = $res->fetch_assoc()['nbrsavan'];
+              }
+            $sql = "SELECT count(*) as Jungle FROM animaux a inner join habitats h on a.id = h.id WHERE h.nom = 'Jungle' " ;
+              $res = $connect->query($sql);
+              if($res) {
+                $Jungle = $res->fetch_assoc()['Jungle'];
+              }
+             $sql = "SELECT count(*) as her FROM animaux a inner join habitats h on a.id = h.id WHERE a.alimentation = 'Herbivore' " ;
+              $res = $connect->query($sql);
+              if($res) {
+                $her = $res->fetch_assoc()['her'];
+              }
+              ?>  <span class="material-symbols-outlined text-6xl text-primary-light mb-6 group-hover:text-primary group-hover:scale-110 transition-all duration-500">pets</span>
             <h3 class="text-5xl font-extrabold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-              
+         <?= $nbranm; ?>
+         
             </h3>
             <p class="text-xl font-semibold text-text-secondary-light dark:text-text-secondary-dark mt-4 group-hover:text-primary-light transition-colors">
                 Animaux Total
@@ -195,10 +215,10 @@ function nav_item($href, $icon, $label, $current_page) {
         <div class="relative z-10 p-8 flex flex-col items-start">
             <span class="material-symbols-outlined text-6xl text-primary-light mb-6 group-hover:text-primary group-hover:scale-110 transition-all duration-500">landscape</span>
             <h3 class="text-5xl font-extrabold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-               
+               <?= $nbrsavan; ?>
             </h3>
             <p class="text-xl font-semibold text-text-secondary-light dark:text-text-secondary-dark mt-4 group-hover:text-primary-light transition-colors">
-                Animaux en Savane
+                Animaux en Savane Africaine
             </p>
         </div>
         
@@ -214,7 +234,7 @@ function nav_item($href, $icon, $label, $current_page) {
         <div class="relative z-10 p-8 flex flex-col items-start">
             <span class="material-symbols-outlined text-6xl text-primary-light mb-6 group-hover:text-primary group-hover:scale-110 transition-all duration-500">forest</span>
             <h3 class="text-5xl font-extrabold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-               
+               <?= $Jungle; ?>
             </h3>
             <p class="text-xl font-semibold text-text-secondary-light dark:text-text-secondary-dark mt-4 group-hover:text-primary-light transition-colors">
                 Animaux en Jungle
@@ -233,10 +253,10 @@ function nav_item($href, $icon, $label, $current_page) {
         <div class="relative z-10 p-8 flex flex-col items-start">
             <span class="material-symbols-outlined text-6xl text-primary-light mb-6 group-hover:text-primary group-hover:scale-110 transition-all duration-500">water_drop</span>
             <h3 class="text-5xl font-extrabold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-             
+             <?= $her; ?>
             </h3>
             <p class="text-xl font-semibold text-text-secondary-light dark:text-text-secondary-dark mt-4 group-hover:text-primary-light transition-colors">
-                Animaux en Soins
+                Animaux Herbivore
             </p>
         </div>
         

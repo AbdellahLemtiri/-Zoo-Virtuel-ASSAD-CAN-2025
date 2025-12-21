@@ -1,10 +1,10 @@
  <?php
-session_start();
+
 require_once "../Fonctionalite_php/auth_check.php";
 protect_page('visiteur'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
 include "../Fonctionalite_php/connect.php";
 $animaux = [];

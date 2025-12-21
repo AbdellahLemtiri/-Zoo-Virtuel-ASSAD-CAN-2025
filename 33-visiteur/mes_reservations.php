@@ -1,11 +1,10 @@
 <?php
 
-session_start();
 require_once "../Fonctionalite_php/auth_check.php";
 protect_page('visiteur'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
 
 ?>
@@ -139,27 +138,27 @@ protect_page('visiteur');
                                     <tr class="<?= $reservation['statut__visite'] ? 'bg-white hover:bg-orange-50/50' : 'bg-gray-50/50' ?> transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1b140d]">
                                             <a href="reservation.php" class="hover:text-primary transition-colors">
-                                                <?= htmlspecialchars($reservation['titre_visite']) ?>
+                                                <?=  ($reservation['titre_visite']) ?>
                                             </a>
-                                            <p class="text-xs text-gray-400">#<?= htmlspecialchars($reservation['id']) ?></p>
+                                            <p class="text-xs text-gray-400">#<?=  ($reservation['id']) ?></p>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                             <?= date('d/m/Y', strtotime($reservation['dateheure_viste'])) ?> à <?= date('H:m', strtotime($reservation['dateheure_viste'])) ?>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            <?= htmlspecialchars($reservation['id_guide']) ?>
+                                            <?=  ($reservation['id_guide']) ?>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            <?= htmlspecialchars($reservation['id_guide']) ?> personne(s)
+                                            <?=  ($reservation['id_guide']) ?> personne(s)
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold status-<?= strtolower(str_replace('é', 'e', $reservation['status'])) ?>">
-                                                <?= htmlspecialchars($reservation['status']) ?>
+                                                <?=  ($reservation['status']) ?>
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <?php if ($reservation['active']): ?>
-                                                <a href="?action=cancel&res_id=<?= htmlspecialchars($reservation['res_id']) ?>"
+                                                <a href="?action=cancel&res_id=<?=  ($reservation['res_id']) ?>"
                                                     onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')"
                                                     class="text-red-600 hover:text-red-900 transition-colors">
                                                     <span class="material-symbols-outlined text-lg align-middle">cancel</span>

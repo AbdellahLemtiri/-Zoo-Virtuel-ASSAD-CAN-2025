@@ -138,8 +138,8 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                                 <span class="material-symbols-outlined text-[18px]">restaurant</span>
                                 <?=$animal['alimentation'] ?>
                             </span>
-                            <h1 class="text-5xl md:text-6xl font-black tracking-tight drop-shadow-lg"><?= htmlspecialchars($animal['nom']) ?></h1>
-                            <p class="text-2xl text-white/90 italic font-medium mt-2 drop-shadow-md"><?= htmlspecialchars($animal['espece']) ?></p>
+                            <h1 class="text-5xl md:text-6xl font-black tracking-tight drop-shadow-lg"><?=  ($animal['nom']) ?></h1>
+                            <p class="text-2xl text-white/90 italic font-medium mt-2 drop-shadow-md"><?=  ($animal['espece']) ?></p>
                         </div>
                     </div>
                     

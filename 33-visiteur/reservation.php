@@ -1,18 +1,18 @@
  <?php
 
-// session_start();
-// require_once "../Fonctionalite_php/auth_check.php";
-// protect_page('visiteur'); 
-//        $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-//         $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-//         $role_utilisateur = htmlspecialchars($_SESSION['role']);
+//  v.statut = 'ouverte'
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('visiteur'); 
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
 include "../Fonctionalite_php/connect.php";
 $sql_guides = "SELECT id, nom FROM utilisateurs WHERE role = 'guide' AND approuve = 1";
 $res_guides = $connect->query($sql_guides);
 $array_guides = $res_guides->fetch_all(MYSQLI_ASSOC);
 
-$where_clause = "WHERE v.statut = 'ouverte'"; 
+$where_clause = "WHERE 1=1"; 
 
 $sql_visites = "SELECT v.*, 
                 (v.capacite_max - COALESCE(SUM(r.nb_personnes), 0)) AS places_restantes
@@ -20,7 +20,7 @@ $sql_visites = "SELECT v.*,
                 LEFT JOIN reservations r ON v.id = r.id_visite
                 $where_clause
                 GROUP BY v.id
-                ORDER BY v.date_heure ASC";
+                ORDER BY v.date_heure DESC";
 
 $res_visites = $connect->query($sql_visites);
 $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
@@ -161,7 +161,7 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
 
         <div class="flex flex-col justify-between flex-1 gap-4">
             <div>
-                <h4 class="text-xl font-bold mb-1 text-[#1b140d]"><?= htmlspecialchars($visit['titre']) ?></h4>
+                <h4 class="text-xl font-bold mb-1 text-[#1b140d]"><?=  ($visit['titre']) ?></h4>
                 <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
                     <div class="flex items-center gap-1">
                         <span class="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
@@ -186,11 +186,23 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
                 </a>
 
            
-            <button onclick="openBookingModal(<?= $visit['id'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
-        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-orange-600 transition-colors">
-    <span class="material-symbols-outlined text-[18px]">confirmation_number</span> 
-    Réserver
-</button>
+        <div class="flex flex-wrap gap-3 mt-auto pt-2 border-t border-gray-100">
+    <a href="visite_details.php?id=<?= $visit['id'] ?>" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors">
+        <span class="material-symbols-outlined text-[18px]">visibility</span> Détails
+    </a>
+
+    <?php if ($date_visite < $maintenant) :?>
+        <button onclick="openReviewModal(<?= $visit['id'] ?>, '<?= addslashes($visit['titre']) ?>')" 
+                class="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">chat</span> Donner avis
+        </button>
+    <?php else : ?>
+        <button onclick="openBookingModal(<?= $visit['id'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
+                class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-orange-600 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">confirmation_number</span> Réserver
+        </button>
+    <?php endif; ?>
+</div>
              
             </div>
         </div>
@@ -234,6 +246,26 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
                     Confirmer
                 </button>
             </div>
+        </form>
+    </div>
+</div>
+<div id="reviewModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl">
+        <div class="flex justify-between items-start mb-6">
+            <h3 id="reviewTitle" class="text-2xl font-bold text-gray-900">Donner votre avis</h3>
+            <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <form action="save_review.php" method="POST" class="space-y-4">
+            <input type="hidden" name="id_visite" id="reviewVisiteId">
+            <div>
+                <label class="block text-sm font-bold mb-2">Note (sur 5)</label>
+                <input type="number" name="note" min="1" max="5" value="5" class="w-full rounded-xl border-gray-200 focus:ring-primary">
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2">Commentaire</label>
+                <textarea name="commentaire" rows="3" class="w-full rounded-xl border-gray-200 focus:ring-primary" placeholder="Qu'avez-vous pensé de cette visite ?"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3.5 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600">Envoyer l'avis</button>
         </form>
     </div>
 </div>
@@ -294,6 +326,15 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
      </footer>
 
      <script>
+        function openReviewModal(id, titre) {
+    document.getElementById('reviewVisiteId').value = id;
+    document.getElementById('reviewTitle').innerText = "Avis : " + titre;
+    document.getElementById('reviewModal').classList.remove('hidden');
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').classList.add('hidden');
+}
 function openBookingModal(id, titre, maxPlaces) {
     const modal = document.getElementById('bookingModal');
     const content = document.getElementById('modalContent');

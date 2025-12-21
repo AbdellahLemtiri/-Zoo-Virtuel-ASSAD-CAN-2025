@@ -1,9 +1,9 @@
 <?php
-// require_once "../Fonctionalite_php/auth_check.php";
-// protect_page('admin'); 
-//        $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-//         $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-//         $role_utilisateur = htmlspecialchars($_SESSION['role']);
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('admin'); 
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 require_once "fx/connect.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -96,7 +96,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
             <nav class="flex flex-col gap-2">
                 
-              <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
+              <a href="index.php" class="<?= nav_item('index.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span class="text-sm font-semibold">Vue d'ensemble</span>
                 </a>
@@ -134,7 +134,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         <p class="text-[11px] text-slate-400 font-medium italic">Super Admin</p>
                     </div>
                 </div>
-                <a href="logout.php" title="Déconnexion" class="text-slate-400 hover:text-red-500 transition-colors">
+                <a href="index.php" title="Déconnexion" class="text-slate-400 hover:text-red-500 transition-colors">
                     <span class="material-symbols-outlined text-xl">logout</span>
                 </a>
             </div>
@@ -176,14 +176,14 @@ function nav_item($href, $icon, $label, $current_page) {
                                         <span class="material-symbols-outlined">forest</span>
                                     </div>
                                     <div>
-                                        <p class="font-bold"><?= htmlspecialchars($hab['nom']) ?></p>
-                                        <p class="text-[10px] text-slate-400">ID: #<?= $hab['id'] ?></p>
+                                        <p class="font-bold"><?=  ($hab['nom']) ?></p>
+                                        <p class="text-[10px] text-slate-400">ID: <?= $hab['id'] ?></p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded-md text-xs font-semibold">
-                                    <?= htmlspecialchars($hab['type_climat']) ?>
+                                    <?=  ($hab['type_climat']) ?>
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center font-bold text-lg"><?= $hab['nb_animaux'] ?></td>

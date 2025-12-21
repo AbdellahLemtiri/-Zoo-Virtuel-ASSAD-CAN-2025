@@ -11,12 +11,12 @@ CREATE TABLE visites_guidees (
 ); -->
 
 <?php
-// session_start();
-// require_once "../Fonctionalite_php/auth_check.php";
-// protect_page('guide'); 
-//        $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-//         $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-//         $role_utilisateur = htmlspecialchars($_SESSION['role']);
+
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('guide'); 
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
 require_once "../Fonctionalite_php/connect.php";
 
@@ -223,7 +223,7 @@ if ($res) {
                                     <div class="h-56 lg:h-48 lg:w-64 rounded-2xl bg-red-100 dark:bg-red-900/20 shrink-0 relative overflow-hidden flex items-center justify-center border border-red-200">
                                         <div class="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-lg">
                                             <span class="material-symbols-outlined text-[14px]">cancel</span>
-                                            <?= htmlspecialchars($visite['statut']) ?>
+                                            <?=  ($visite['statut']) ?>
                                         </div>
 
                                         <span class="material-symbols-outlined text-red-300 text-5xl opacity-50">block</span>
@@ -235,7 +235,7 @@ if ($res) {
                                     <div class="h-56 lg:h-48 lg:w-64 rounded-2xl bg-emerald-500 dark:bg-red-900/20 shrink-0 relative overflow-hidden flex items-center justify-center border border-red-200">
                                         <div class="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-lg">
                                             <span class="material-symbols-outlined text-[14px]">cancel</span>
-                                            <?= htmlspecialchars($visite['statut']) ?>
+                                            <?=  ($visite['statut']) ?>
                                         </div>
 
                                         <span class="material-symbols-outlined text-red-300 text-5xl opacity-50">block</span>
@@ -275,9 +275,9 @@ if ($res) {
                                         <div class="flex gap-2">
                                             <a href="visite_details.php?id=<?= $visite['idvg'] ?>" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all">
                                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                                Gérer la visite
+                                               details de la visite
                                             </a>
-                                            <a href="fx/visite_edit.php?id=<?= $visite['idvg'] ?>" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                            <a href="fx/modifier.php?id=<?= $visite['idvg'] ?>" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                                 <span class="material-symbols-outlined text-[18px]">edit</span>
                                                 Modifier
                                             </a>

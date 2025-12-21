@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('visiteur'); 
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
-
-require_once "connect.php"; 
+require_once "../Fonctionalite_php/connect.php"; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_utilisateur = $_SESSION['id']; 
     $nb_personnes = $_POST['nb_personnes'];
 
-   
     $sql_check = "SELECT v.capacite_max, 
                  (v.capacite_max - COALESCE(SUM(r.nb_personnes), 0)) AS places_restantes
                  FROM visites_guidees v
@@ -41,19 +40,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($stmt_in->execute()) {
                 
-                header("Location: ../reservation.php?success=Réservation confirmée !");
+                header("Location: reservation.php?success=Réservation confirmée !");
                 exit();
             } else {
-                header("Location: ../reservation.php?error=Erreur lors de l'enregistrement");
+                header("Location: reservation.php?error=Erreur lors de l'enregistrement");
                 exit();
             }
             
         } else {
-            header("Location: ../reservation.php?error=Places insuffisantes");
+            header("Location: reservation.php?error=Places insuffisantes");
             exit();
         }
     } else {
-        header("Location: ../reservation.php?error=Visite introuvable");
+        header("Location: reservation.php?error=Visite introuvable");
         exit();
     }
 

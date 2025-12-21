@@ -1,10 +1,10 @@
 <?php
-session_start();
+
 require_once "../Fonctionalite_php/auth_check.php";
 protect_page('admin'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+       $id_utilisateur =  ($_SESSION['id']) ;
+        $nom_utilisateur =  ($_SESSION['nom']);
+        $role_utilisateur =  ($_SESSION['role']);
 
 require_once "../Fonctionalite_php/connect.php";
 
@@ -112,7 +112,7 @@ function nav_item($href, $icon, $label, $current_page) {
 
             <nav class="flex flex-col gap-2">
                 
-              <a href="dash.php" class="<?= nav_item('dash.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
+              <a href="index.php" class="<?= nav_item('index.php', 'dashboard', 'Vue d\'ensemble', $current_page) ?>">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span class="text-sm font-semibold">Vue d'ensemble</span>
                 </a>
@@ -150,7 +150,7 @@ function nav_item($href, $icon, $label, $current_page) {
                         <p class="text-[11px] text-slate-400 font-medium italic">Super Admin</p>
                     </div>
                 </div>
-                <a href="logout.php" title="Déconnexion" class="text-slate-400 hover:text-red-500 transition-colors">
+                <a href="index.php" title="Déconnexion" class="text-slate-400 hover:text-red-500 transition-colors">
                     <span class="material-symbols-outlined text-xl">logout</span>
                 </a>
             </div>
@@ -189,26 +189,26 @@ function nav_item($href, $icon, $label, $current_page) {
                         <?php foreach ($animaux as $animal): ?>
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 group transition-colors">
                             <td class="px-6 py-4 flex items-center gap-4">
-                                <img src="<?= htmlspecialchars($animal['image']) ?>" class="h-12 w-12 rounded-lg object-cover bg-gray-100" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
+                                <img src="<?=  ($animal['image']) ?>" class="h-12 w-12 rounded-lg object-cover bg-gray-100" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
                                 <div>
-                                    <p class="font-bold"><?= htmlspecialchars($animal['nom']) ?></p>
+                                    <p class="font-bold"><?=  ($animal['nom']) ?></p>
                                     <p class="text-xs text-slate-400">ID: #<?= $animal['id'] ?></p>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 italic text-slate-500"><?= htmlspecialchars($animal['espece']) ?></td>
-                            <td class="px-6 py-4"><?= htmlspecialchars($animal['nom_habitat'] ?? 'Non défini') ?></td>
-                            <td class="px-6 py-4"><?= htmlspecialchars($animal['alimentation']) ?></td>
+                            <td class="px-6 py-4 italic text-slate-500"><?=  ($animal['espece']) ?></td>
+                            <td class="px-6 py-4"><?=  ($animal['nom_habitat'] ?? 'Non défini') ?></td>
+                            <td class="px-6 py-4"><?=  ($animal['alimentation']) ?></td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
                                     <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                                         data-open-edit
                                         data-id="<?= $animal['id'] ?>"
-                                        data-nom="<?= htmlspecialchars($animal['nom']) ?>"
-                                        data-espece="<?= htmlspecialchars($animal['espece']) ?>"
-                                        data-alimentation="<?= htmlspecialchars($animal['alimentation']) ?>"
-                                        data-image="<?= htmlspecialchars($animal['image']) ?>"
-                                        data-pays="<?= htmlspecialchars($animal['pays_origine']) ?>"
-                                        data-desc="<?= htmlspecialchars($animal['description_courte']) ?>"
+                                        data-nom="<?=  ($animal['nom']) ?>"
+                                        data-espece="<?=  ($animal['espece']) ?>"
+                                        data-alimentation="<?=  ($animal['alimentation']) ?>"
+                                        data-image="<?=  ($animal['image']) ?>"
+                                        data-pays="<?=  ($animal['pays_origine']) ?>"
+                                        data-desc="<?=  ($animal['description_courte']) ?>"
                                         data-habitat="<?= $animal['id_habitat'] ?>">
                                         <span class="material-symbols-outlined">edit</span>
                                     </button>
