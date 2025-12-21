@@ -1,7 +1,7 @@
 <?php
 
 require_once "connect.php";
-
+session_start();
 if (
     $_SERVER['REQUEST_METHOD'] === "POST" &&
     isset($_POST['full-name'], $_POST['role'], $_POST['reg-email'], $_POST['reg-password'])
@@ -22,7 +22,6 @@ if (
     if ($stmt->execute()) {
         header("Location: ../connexion.php?message=user_added");
     } else {
-
         header("Location: ../connexion.php?error=4");
     }
 

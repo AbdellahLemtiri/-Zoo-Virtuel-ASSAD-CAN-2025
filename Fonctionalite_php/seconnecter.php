@@ -56,11 +56,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["role"] = $user["role"];
 
         if ($user["role"] === "admin") {
-            header("Location: 11-admin/dash.php");
+            header("Location:11-admin/inedx.php");
         } elseif ($user["role"] === "guide") {
-            header("Location: ../guide/dash.php");
+            header("Location:22-guide/index.php");
         } elseif ($user["role"] === "guide") {
-            header("Location: ../pages/visiteur_dashboard.php");
+            header("Location:33-visiteur/index.php");
         }
         exit;
     } else {

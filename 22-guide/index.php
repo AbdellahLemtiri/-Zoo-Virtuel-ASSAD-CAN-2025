@@ -9,6 +9,7 @@ CREATE TABLE visites_guidees (
   duree INT,
   prix DECIMAL(8,2)
 ); -->
+
 <?php
 require_once "../Fonctionalite_php/connect.php";
 
