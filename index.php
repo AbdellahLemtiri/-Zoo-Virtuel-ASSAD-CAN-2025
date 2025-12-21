@@ -1,96 +1,3 @@
- <?php
-
-session_start();
-require_once "Fonctionalite_php/connect.php";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    if (isset($_POST["email"], $_POST["password"]) && !empty($_POST["email"]) && !empty($_POST["password"])) {
-
-        $email = trim($_POST["email"]);
-        $password = $_POST["password"];
-
-    
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            header("Location: login.php?error=email_format");
-            exit;
-        }
-
-        $passwordRegex = "/^(?=.*[0-9]).{5,}$/"; 
-        if (!preg_match($passwordRegex, $password)) {
-          
-            header("Location: login.php?error=password_weak");
-            exit;
-        }
-
-        $stmt = $connect->prepare("SELECT id, nom, role, mot_passe_hash, approuve FROM utilisateurs WHERE email = ? LIMIT 1");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        if (!$user || !password_verify($password, $user["mot_passe_hash"])) {
-            header("Location: login.php?error=login_failed");
-            exit;
-        }
-
-        if ($user["role"] === "guide" && (int)$user["approuve"] === 0) {
-            header("Location: pages/booking_confirmation_page.php");
-            exit;
-        }
-        $_SESSION["id"] = $user["id"];
-        $_SESSION["nom"] = $user["nom"];
-        $_SESSION["role"] = $user["role"];
-
-       
-        if ($user["role"] === "admin") {
-            header("Location: 11-admin/index.php");
-        } elseif ($user["role"] === "guide") {
-            header("Location: 22-guide/index.php");
-        } elseif ($user["role"] === "visiteur") { 
-            header("Location: 33-visiteur/index.php");
-        }
-        exit;
-
-    } else {
-        header("Location: login.php?error=empty_fields");
-        exit;
-    }
-}
-
-
-if (
-    $_SERVER['REQUEST_METHOD'] === "POST" &&
-    isset($_POST['nom'], $_POST['role'], $_POST['email'], $_POST['password'])
-) {
-
-    $fullName = $_POST['nom'];
-    $role = $_POST['role'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-
-    $hashedPassword = password_hash($password,PASSWORD_DEFAULT);
-    
-    $sql = "INSERT INTO utilisateurs (nom, role, email, mot_passe_hash) VALUES (?, ?, ?, ?)";
-
-    $stmt = $connect->prepare($sql);
-    $stmt->bind_param("ssss", $fullName, $role, $email, $hashedPassword);
-
-    if ($stmt->execute()) {
-        
-      
-    } else {
-        header("Location: ../index.php?error=4");
-    }
-
-    $stmt->close();
-} else {
-
-    header("Location: ../index.php?error=1");
-    exit();
-
-}
-
-?>
- 
  <!DOCTYPE html>
  <html class="light" lang="fr">
 
@@ -220,7 +127,7 @@ if (
                  </div>
 
                  <div id="loginForm" class="tab-content hidden">
-                     <form method="POST" action="" class="flex flex-col gap-5 mt-2">
+                     <form method="POST" action="Fonctionalite_php/seconnecter.php" class="flex flex-col gap-5 mt-2">
                          <div class="flex flex-col gap-2">
                              <label class="text-sm font-bold text-text-main dark:text-white" for="email">Adresse
                                  e-mail</label>
@@ -272,7 +179,7 @@ if (
                  </div>
 
                  <div id="registerForm" class="tab-content">
-                     <form action="" method="POST" class="flex flex-col gap-5 mt-2">
+                     <form action="Fonctionalite_php/inscrire.php" method="POST" class="flex flex-col gap-5 mt-2">
 
                          <div class="flex flex-col gap-2">
                              <label class="text-sm font-bold text-text-main dark:text-white" for="full-name">Nom </label>
@@ -314,7 +221,7 @@ if (
                                  </div>
                                  <input
                                      class="w-full h-12 pl-10 pr-4 bg-white dark:bg-white/5 border border-[#e7dbcf] dark:border-white/10 rounded-lg text-sm text-text-main dark:text-white placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                                     id="reg-email" name="email" placeholder="nom@exemple.com" type="email" required />
+                                     id="reg-email" name="reg-email" placeholder="nom@exemple.com" type="email" required />
                              </div>
                          </div>
 
@@ -328,7 +235,7 @@ if (
                                  </div>
                                  <input
                                      class="w-full h-12 pl-10 pr-10 bg-white dark:bg-white/5 border border-[#e7dbcf] dark:border-white/10 rounded-lg text-sm text-text-main dark:text-white placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                                     id="reg-password" name="password" placeholder="••••••••" type="password" required />
+                                     id="reg-password" name="reg-password" placeholder="••••••••" type="password" required />
                                  <button
                                      class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main dark:hover:text-white"
                                      type="button">
