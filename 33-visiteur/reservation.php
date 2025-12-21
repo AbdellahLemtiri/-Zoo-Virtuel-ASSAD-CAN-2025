@@ -72,8 +72,7 @@
     // }
 
 
-    include "../Fonctionalite_php/connect.php";
-
+include "../Fonctionalite_php/connect.php";
 $sql_guides = "SELECT id, nom FROM utilisateurs WHERE role = 'guide' AND approuve = 1";
 $res_guides = $connect->query($sql_guides);
 $array_guides = $res_guides->fetch_all(MYSQLI_ASSOC);
@@ -90,7 +89,7 @@ $sql_visites = "SELECT v.*,
 
 $res_visites = $connect->query($sql_visites);
 $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
-    ?>
+?>
 
  <!DOCTYPE html>
 
@@ -107,28 +106,64 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
          rel="stylesheet" />
      <script id="tailwind-config">
-         tailwind.config = {
-             darkMode: "class",
-             theme: {
-                 extend: {
-                     colors: {
-                         "primary": "#ec7f13",
-                         "background-light": "#f8f7f6",
-                         "background-dark": "#221910",
-                     },
-                     fontFamily: {
-                         "display": ["Plus Jakarta Sans", "sans-serif"]
-                     },
-                     borderRadius: {
-                         "DEFAULT": "0.5rem",
-                         "lg": "1rem",
-                         "xl": "1.5rem",
-                         "full": "9999px"
-                     },
-                 },
-             },
-         }
-     </script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0d9488", 
+                        "primary-dark": "#0f766e",
+                        "primary-light": "#2dd4bf",
+                        "background-light": "#f0fdfa",
+                        "background-dark": "#042f2e",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#134e4a",
+                        "text-light": "#164e63",
+                        "text-dark": "#a7f3d0",
+                        "text-secondary-light": "#0891b2",
+                        "text-secondary-dark": "#5eead4",
+                        "accent": "#f59e0b"
+                    },
+                    fontFamily: {
+                        sans: ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.7s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 2s infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': {
+                                opacity: '0'
+                            },
+                            '100%': {
+                                opacity: '1'
+                            }
+                        },
+                        slideUp: {
+                            '0%': {
+                                transform: 'translateY(60px)',
+                                opacity: '0'
+                            },
+                            '100%': {
+                                transform: 'translateY(0)',
+                                opacity: '1'
+                            }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': {
+                                boxShadow: '0 0 20px rgba(13,148,136,0.3)'
+                            },
+                            '50%': {
+                                boxShadow: '0 0 40px rgba(13,148,136,0.6)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
      <style>
          .material-symbols-outlined {
              font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -215,19 +250,60 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
                     <span class="material-symbols-outlined text-[18px]">visibility</span> Détails
                 </a>
 
-                <?php if (!$is_full && isset($_SESSION['user_id'])) : ?>
-                    <button onclick="openBookingModal(<?= $visit['id'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-orange-600 transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">confirmation_number</span> Réserver
-                    </button>
-                <?php elseif (!$is_full): ?>
-                    <a href="login.php" class="text-xs text-primary underline">Connectez-vous pour réserver</a>
-                <?php endif; ?>
+           
+            <button onclick="openBookingModal(<?= $visit['id'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
+        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-orange-600 transition-colors">
+    <span class="material-symbols-outlined text-[18px]">confirmation_number</span> 
+    Réserver
+</button>
+             
             </div>
         </div>
     </div>
 <?php endforeach; ?>
+<div id="bookingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 transition-opacity duration-300">
+    
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl max-w-md w-full p-8 shadow-2xl transform transition-all scale-95 opacity-0" id="modalContent">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h3 id="modalTitle" class="text-2xl font-bold text-gray-900 dark:text-white">Réserver votre place</h3>
+                <p id="modalSubTitle" class="text-gray-500 text-sm mt-1"></p>
+            </div>
+            <button onclick="closeBookingModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form action="fx/confirm_booking.php" method="POST" class="space-y-6">
+            <input type="hidden" name="id_visite" id="modalVisiteId">
+            
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Nombre de participants
+                </label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">group</span>
+                    <input type="number" name="nb_personnes" min="1" value="1" id="modalInputNb"
+                           class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-semibold text-lg">
+                </div>
+                <p id="placesInfo" class="text-xs text-primary font-medium italic"></p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closeBookingModal()" 
+                        class="flex-1 py-3.5 bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors">
+                    Annuler
+                </button>
+                <button type="submit" 
+                        class="flex-1 py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-orange-600 shadow-lg shadow-primary/30 transition-all active:scale-95">
+                    Confirmer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 <div style="height: 200px;"></div>
+
      <footer class="bg-[#1b140d] text-white pt-16 pb-8 mt-auto">
          <div class="max-w-[1200px] mx-auto px-4 md:px-10">
              <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
@@ -281,6 +357,44 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
              </div>
          </div>
      </footer>
+
+     <script>
+function openBookingModal(id, titre, maxPlaces) {
+    const modal = document.getElementById('bookingModal');
+    const content = document.getElementById('modalContent');
+    
+    document.getElementById('modalVisiteId').value = id;
+    document.getElementById('modalTitle').innerText = titre;
+    document.getElementById('modalInputNb').max = maxPlaces;
+    document.getElementById('placesInfo').innerText = `Il reste ${maxPlaces} places disponibles pour cette session.`;
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.add('opacity-100');
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeBookingModal() {
+    const modal = document.getElementById('bookingModal');
+    const content = document.getElementById('modalContent');
+
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('bookingModal');
+    if (event.target == modal) {
+        closeBookingModal();
+    }
+}
+</script>
  </body>
 
  </html>

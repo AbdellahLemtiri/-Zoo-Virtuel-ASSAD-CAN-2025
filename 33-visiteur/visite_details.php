@@ -1,325 +1,269 @@
- <?php
+<?php
+require_once "../Fonctionalite_php/connect.php";
 
-//     $image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
-    
-//     session_start();
-//     // $_SESSION['role_utilisateur'] = "visiteur";
-// include "../Fonctionalite_php/connect.php";
+$id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-//     if (
-//         // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-//         // $_SESSION['role_utilisateur'] === "visiteur" &&
-//         // $_SESSION['logged_in'] === TRUE
-//         1
-//     ) {
-//            $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
-//         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
-//         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
-//         $tour_id = $_GET['id'];
+if ($id) {
+    $sql = "SELECT * FROM visites_guidees WHERE id = $id";
+    $res = $connect->query($sql);
 
-//         $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =  id_guide and id_visite = $tour_id";
-//         $resultat = $conn->query($sql);
+    $visite = null;
+    if ($res && $res->num_rows > 0) {
+        $visite = $res->fetch_assoc();
+    }
 
-//         $tour = array();
-//         if ($resultat->num_rows == 1) {
-//             $tour = $resultat->fetch_assoc();
-//             $sql = " select * from  visitesguidees v inner join  etapesvisite e on v.id_visite= e.id_visite   and v.id_visite = $tour_id";
-//             $resultat = $conn->query($sql);
-//             $array_etapes = array();
-//             while ($ligne =  $resultat->fetch_assoc())
-//                 array_push($array_etapes, $ligne);
+    $sql2 = "SELECT * FROM etapes_visite WHERE id_visite = $id ORDER BY ordre_etape ASC";
+    $res2 = $connect->query($sql2);
 
-//             $sql = " select sum(r.nb_personnes) as nb_participants from  visitesguidees v inner join  reservations r   on r.id_visite= v.id_visite
-//                     inner join  utilisateurs u   on u.id_utilisateur= v.id_guide where  v.id_visite = $tour_id  ";
-//             $resultat = $conn->query($sql);
-//             $nb_participants = $resultat->fetch_assoc()["nb_participants"];
-//         }
-//     } else {
-//         header("Location: ../connexion.php?error=access_denied");
-//         exit();
-//     }
+    $les_etapes = [];
+    if ($res2) {
+        $les_etapes = $res2->fetch_all(MYSQLI_ASSOC);
+    }
 
+    $les_utl = [];
+    $sql3 = "SELECT * FROM utilisateurs ut inner join reservations r on r.id_visite = $id WHERE ut.id = r.id_utilisateur ORDER BY ut.nom ";
+    $res = $connect->query($sql3);
+    if ($res) {
+        $les_utl = $res->fetch_all(MYSQLI_ASSOC);
+    }
+}
+?>
+<!DOCTYPE html>
 
+<html class="light" lang="fr">
 
-
-
-
-
-
-
-
-
-
-    ?>
-
- <!DOCTYPE html>
-
- <html class="light" lang="fr">
-
- <head>
-     <meta charset="utf-8" />
-     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-     <title>Détails : <?= htmlspecialchars($tour['title']) ?> - ASSAD</title>
-     <link href="https://fonts.googleapis.com" rel="preconnect" />
-     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
-     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Détails : <?= htmlspecialchars($tour['title']) ?> - ASSAD</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    primary: "#0d9488",          // Teal واعر مودرن
-                    "primary-dark": "#0f766e",
-                    "primary-light": "#2dd4bf",
-                    "background-light": "#f0fdfa",
-                    "background-dark": "#042f2e",
-                    "surface-light": "#ffffff",
-                    "surface-dark": "#134e4a",
-                    "text-light": "#164e63",
-                    "text-dark": "#a7f3d0",
-                    "text-secondary-light": "#0891b2",
-                    "text-secondary-dark": "#5eead4",
-                    "accent": "#f59e0b"          // لمسة ذهبية
-                },
-                fontFamily: {
-                    sans: ["Plus Jakarta Sans", "sans-serif"]
-                },
-                animation: {
-                    'fade-in': 'fadeIn 0.7s ease-out forwards',
-                    'slide-up': 'slideUp 0.8s ease-out forwards',
-                    'pulse-glow': 'pulseGlow 2s infinite'
-                },
-                keyframes: {
-                    fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                    slideUp: { '0%': { transform: 'translateY(60px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                    pulseGlow: { '0%, 100%': { boxShadow: '0 0 20px rgba(13,148,136,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(13,148,136,0.6)' } }
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0d9488", // Teal واعر مودرن
+                        "primary-dark": "#0f766e",
+                        "primary-light": "#2dd4bf",
+                        "background-light": "#f0fdfa",
+                        "background-dark": "#042f2e",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#134e4a",
+                        "text-light": "#164e63",
+                        "text-dark": "#a7f3d0",
+                        "text-secondary-light": "#0891b2",
+                        "text-secondary-dark": "#5eead4",
+                        "accent": "#f59e0b" // لمسة ذهبية
+                    },
+                    fontFamily: {
+                        sans: ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.7s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 2s infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': {
+                                opacity: '0'
+                            },
+                            '100%': {
+                                opacity: '1'
+                            }
+                        },
+                        slideUp: {
+                            '0%': {
+                                transform: 'translateY(60px)',
+                                opacity: '0'
+                            },
+                            '100%': {
+                                transform: 'translateY(0)',
+                                opacity: '1'
+                            }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': {
+                                boxShadow: '0 0 20px rgba(13,148,136,0.3)'
+                            },
+                            '50%': {
+                                boxShadow: '0 0 40px rgba(13,148,136,0.6)'
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-</script>
-     <style>
-         .material-symbols-outlined {
-             font-variation-settings:
-                 'FILL' 1,
-                 'wght' 400,
-                 'GRAD' 0,
-                 'opsz' 24
-         }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 1,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
 
-         body {
-             font-family: "Plus Jakarta Sans", sans-serif;
-         }
-     </style>
- </head>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+    </style>
+</head>
 
- <body class="bg-background-light dark:bg-background-dark text-[#1b140d] font-display min-h-screen flex flex-col">
-     <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#f3ede7]">
-         <div class="max-w-[1200px] mx-auto px-4 md:px-10 py-3">
-             <div class="flex items-center justify-between whitespace-nowrap">
-                 <div class="flex items-center gap-4">
-                     <div class="text-primary">
-                         <span class="material-symbols-outlined text-4xl">pets</span>
-                     </div>
-                     <h2 class="text-[#1b140d] text-lg font-bold leading-tight tracking-[-0.015em]">Zoo Virtuel ASSAD
-                     </h2>
-                 </div>
-                 <div class="hidden lg:flex flex-1 justify-end gap-8">
-                     <div class="flex items-center gap-9">
-                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="index.php">Accueil</a>
-                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="animaux.php">Animaux</a>
-                         <a class="text-primary text-sm font-bold hover:text-primary transition-colors"
-                             href="reservation.php">Réservation</a>
-                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="#">CAN 2025</a>
-                     </div>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-200">
+    <div class="flex h-screen w-full overflow-hidden">
+  
+        <main class="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden bg-background-light dark:bg-background-dark">
+            <div class="p-6 md:p-10 max-w-7xl mx-auto w-full flex flex-col gap-8">
 
-                 </div>
-                 <button class="lg:hidden text-[#1b140d]">
-                     <span class="material-symbols-outlined">menu</span>
-                 </button>
-             </div>
-         </div>
-     </header>
-     <div class="flex h-screen w-full overflow-hidden">
+                <a href="reservation.php" class="text-sm text-text-sec-light dark:text-text-sec-dark hover:text-primary transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    Retour à Mes Visites
+                </a>
 
-         <main class="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden">
-             <div class="lg:hidden flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0 z-20">
-                 <span class="material-symbols-outlined text-primary">pets</span>
-                 <span class="material-symbols-outlined text-text-main-light dark:text-text-main-dark">menu</span>
-             </div>
+                <div class="flex flex-wrap justify-between items-start gap-4 pb-4 border-b border-border-light dark:border-border-dark">
+                    <div class="flex flex-col gap-1">
+                        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-text-light dark:text-text-dark">Titre de la Visite</h2>
+                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-lg">Détails et gestion de la Visite id = <?= $visite['id'] ?></p>
+                    </div>
 
-             <div class="p-6 md:p-10 max-w-7xl mx-auto w-full flex flex-col gap-8">
-                 <a href="./reservation.php" class="text-sm text-text-sec-light dark:text-text-sec-dark hover:text-primary transition-colors flex items-center gap-1">
-                     <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-                     Retour à les  Visites
-                 </a>
+                    <div class="flex flex-wrap gap-3">
+                        <a class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg font-bold shadow-lg transition-all transform hover:scale-105">
+                            <span class="material-symbols-outlined text-[20px]">videocam</span>
+                            <span>reserver la Visite</span>
+    </a>
+                      
+                    </div>
+                </div>
 
-                 <div class="flex flex-wrap justify-between items-start gap-4 pb-4 border-b border-border-light dark:border-border-dark">
-                     <div class="flex flex-col gap-1">
-                         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= htmlspecialchars($tour['titre_visite']) ?></h2>
-                         <p class="text-text-sec-light dark:text-text-sec-dark text-lg">Détails de Visite #<?= $tour_id ?></p>
-                     </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+                    <div class="lg:col-span-1 flex flex-col gap-6">
+                        <div class="h-60 rounded-2xl bg-slate-200 dark:bg-surface-dark bg-cover bg-center relative shadow-md border border-border-light dark:border-border-dark overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1 bg-primary text-white text-xs font-bold rounded-full items-center gap-1 shadow-lg">
+                                <span class="material-symbols-outlined text-[14px]">stars</span>
+                                STATUT_ICI
+                            </div>
+                        </div>
 
-                 </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm p-6">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
+                                <span class="material-symbols-outlined">analytics</span>
+                                Détails Techniques
+                            </h3>
+                            <ul class="space-y-4">
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Date & Heure</span>
+                                    <span class="text-sm font-semibold"><?= $visite['date_heure'] ?></span>
+                                </li>
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Durée & Langue</span>
+                                    <span class="text-sm font-semibold"><?= $visite['duree'] . "min | " . $visite['langue']   ?></span>
+                                </li>
+                                <li class="flex flex-col gap-1">
+                                    <span class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Prix de la séance</span>
+                                    <span class="text-sm font-bold text-accent"><?= $visite['prix'] . " dh" ?></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
 
-                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 flex flex-col gap-6">
 
-                     <div class="lg:col-span-1 flex flex-col gap-6">
+                        <div class="grid grid-cols-3 gap-4">
+                       
+                            <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-border-light dark:border-border-dark text-center">
+                                <p class="text-2xl font-black text-accent"><?= $visite['capacite_max'] ?></p>
+                                <p class="text-[10px] uppercase font-bold opacity-60">Capacité Max</p>
+                            </div>
+                        
+                        </div>
 
-                         <div class="h-60 rounded-xl bg-cover bg-center relative shadow-lg border border-border-light dark:border-border-dark" style='background-image: url("<?= $image ?>");'>
-                             <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-sm font-bold rounded-lg items-center gap-1">
-                                 <span class="material-symbols-outlined text-[14px] leading-none">schedule</span>
-                                 <?= $tour['statut__visite'] ?>
-                             </div>
-                         </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden">
+                            <div class="p-5 bg-slate-50 dark:bg-black/10 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+                                <h3 class="font-bold flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">group</span>
+                                    Liste des Participants
+                                </h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="text-[11px] uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark border-b border-border-light dark:border-border-dark">
+                                            <th class="px-6 py-4 font-bold">Visiteur</th>
+                                            <th class="px-6 py-4 font-bold text-center">Places</th>
 
-                         <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm p-5 flex flex-col gap-4">
-                             <h3 class="text-xl font-bold flex items-center gap-2 text-primary">
-                                 <span class="material-symbols-outlined">info</span>
-                                 Informations Clés
-                             </h3>
-                             <ul class="space-y-3 text-sm">
-                                 <li class="flex justify-between items-center pb-1 border-b border-border-light dark:border-border-dark/50">
-                                     <span class="text-text-sec-light dark:text-text-sec-dark font-medium">Date & Heure :</span>
-                                     <span class="font-semibold"><?= (new DateTime($tour['dateheure_viste']))->format('d M Y') ?> à <?= (new DateTime($tour['dateheure_viste']))->format('h:m ')  ?></span>
-                                 </li>
-                                 <li class="flex justify-between items-center pb-1 border-b border-border-light dark:border-border-dark/50">
-                                     <span class="text-text-sec-light dark:text-text-sec-dark font-medium">Durée Estimée :</span>
-                                     <span class="font-semibold"><?= $tour['duree__visite'] ?></span>
-                                 </li>
-                                 <li class="flex justify-between items-center pb-1 border-b border-border-light dark:border-border-dark/50">
-                                     <span class="text-text-sec-light dark:text-text-sec-dark font-medium">langue :</span>
-                                     <span class="font-semibold text-primary"><?= $tour['langue__visite'] ?></span>
-                                 </li>
-                                 <li class="flex justify-between items-center pb-1">
-                                     <span class="text-text-sec-light dark:text-text-sec-dark font-medium">Guide Assigné :</span>
-                                     <span class="font-semibold"><?= $tour['nom_utilisateur'] ?></span>
-                                 </li>
-                             </ul>
-                         </div>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border-light dark:divide-border-dark">
+                                        <?php foreach ($les_utl as $utl): ?>
+                                            <tr class="hover:bg-primary/5 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="text-sm font-bold"><?= $utl['nom'] ?></div>
+                                                    <div class="text-xs opacity-60"><?= $utl['email'] ?></div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-md text-xs font-bold"><?= $utl['nb_personnes'] ?></span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
 
-                         <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm p-5">
-                             <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
-                                 <span class="material-symbols-outlined text-primary">description</span>
-                                 Description
-                             </h3>
-                             <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (htmlspecialchars($tour['description_visite'])) ?></p>
-                         </div>
-                     </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
-                     <div class="lg:col-span-2 flex flex-col gap-6">
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark p-6">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">format_list_numbered</span>
+                                Étapes de la Visite
+                            </h3>
+                            <?php foreach ($les_etapes as $etp) : ?>
+                                <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+                                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-surface-dark text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                                            <?= $etp['ordre_etape'] ?>
+                                        </div>
+                                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark shadow-sm">
+                                            <div class="font-bold text-primary"><?= $etp['titre_etape'] ?></div>
+                                            <div class="text-xs opacity-70"><?= $etp['description_etape'] ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
 
-                         <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm p-5">
-                             <h3 class="text-xl font-bold mb-3 flex items-center gap-2 text-green-600">
-                                 <span class="material-symbols-outlined">group</span>
-                                 Résumé des Réservations
-                             </h3>
-                             <div class="grid grid-cols-3 gap-4 text-center border-t border-border-light dark:border-border-dark/50 pt-3">
-                                 <div class="p-2 border-r border-border-light dark:border-border-dark/50">
-                                     <p class="text-3xl font-extrabold text-text-main-light dark:text-text-main-dark"><?= $tour['capacite_max__visite'] ?></p>
-                                     <p class="text-sm text-text-sec-light dark:text-text-sec-dark">Places Total</p>
-                                 </div>
-                                 <div class="p-2 border-r border-border-light dark:border-border-dark/50">
-                                     <p class="text-3xl font-extrabold text-blue-600"><?= $nb_participants ?></p>
-                                     <p class="text-sm text-text-sec-light dark:text-text-sec-dark">Réservations Confirmées</p>
-                                 </div>
-                                 <div class="p-2">
-                                     <p class="text-3xl font-extrabold   dark:text-text-main-dark   text-green-600"><?= $tour['capacite_max__visite'] - $nb_participants ?></p>
-                                     <p class="text-sm text-text-sec-light dark:text-text-sec-dark">Places Restantes</p>
-                                 </div>
-                             </div>
-                         </div>
+                    </div>
+                </div>
 
-                         <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm overflow-x-auto">
-                             <div class="p-5 border-b border-border-light dark:border-border-dark">
-                                 <h3 class="text-xl font-bold flex items-center gap-2">
-                                     <span class="material-symbols-outlined text-primary">list_alt</span>
-                                     les etape de visite
-                                 </h3>
-                             </div>
-                             <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
-                                 <thead class="bg-gray-50/50 dark:bg-white/5">
-                                     <tr>
-                                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-text-sec-light dark:text-text-sec-dark uppercase tracking-wider">
-                                             Titre d'Etape
-                                         </th>
-                                         <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-text-sec-light dark:text-text-sec-dark uppercase tracking-wider">
-                                             Description d'Etape
-                                         </th>
+               
+            </div>
+        </main>
+    </div>
 
-                                         <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-text-sec-light dark:text-text-sec-dark uppercase tracking-wider">
-                                             order
-                                         </th>
-                                     </tr>
-                                 </thead>
-                                 <tbody class="divide-y divide-border-light dark:divide-border-dark">
-                                     <?php foreach ($array_etapes as $etape) : ?>
-                                         <tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors">
-                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                 <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= htmlspecialchars($etape['titre_etape']) ?></div>
-                                                 <div class="text-xs text-text-sec-light dark:text-text-sec-dark truncate"><?= htmlspecialchars($etape['description_etape']) ?></div>
-                                             </td>
-                                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                 <span class="text-sm font-bold"><?= htmlspecialchars($etape['description_etape']) ?></span>
-                                             </td>
+    <script>
+        document.getElementById('copy-link-btn').addEventListener('click', function() {
+            const link = this.getAttribute('data-link');
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Lien copié dans le presse-papiers !');
+                this.innerHTML = '<span class="material-symbols-outlined text-[20px]">check</span> Copié !';
+                setTimeout(() => {
+                    this.innerHTML = '<span class="material-symbols-outlined text-[20px]">content_copy</span> Copier le Lien';
+                }, 1500);
+            }).catch(err => {
+                console.error('Erreur lors de la copie: ', err);
+            });
+        });
+    </script>
+</body>
 
-                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                 <div class="flex justify-end gap-2">
-
-                                                     <button title="Envoyer un rappel" class="text-blue-600 hover:text-blue-700 transition-colors p-1 rounded-full">
-                                                         <span class="text-3xl font-extrabold text-blue-600"> <?= $etape['ordre_etape'] ?></span>
-                                                     </button>
-                                                 </div>
-                                             </td>
-                                         </tr>
-                                     <?php endforeach; ?>
-                                 </tbody>
-                             </table>
-
-                             <?php if (empty($participants)): ?>
-                                 <div class="p-6 text-center text-text-sec-light dark:text-text-sec-dark text-sm">
-                                     Aucun participant pour cette visite pour l'instant.
-                                 </div>
-                             <?php endif; ?>
-
-                             <div class="p-4 border-t border-border-light dark:border-border-dark/50 text-right">
-                                 <a href="reservations.php?tour_id=<?= $tour_id ?>" class="text-sm text-primary font-semibold hover:underline">
-                                     Gérer toutes les réservations
-                                     <span class="material-symbols-outlined text-[16px] align-middle ml-1">arrow_forward</span>
-                                 </a>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-
-
-             </div>
-         </main>
-     </div>
-
-     <!-- <script>
-         document.getElementById('copy-link-btn').addEventListener('click', function() {
-             const link = this.getAttribute('data-link');
-             navigator.clipboard.writeText(link).then(() => {
-                 alert('Lien copié dans le presse-papiers !');
-                 // Optionnellement, changer le texte du bouton brièvement
-                 this.innerHTML = '<span class="material-symbols-outlined text-[20px]">check</span> Copié !';
-                 setTimeout(() => {
-                     this.innerHTML = '<span class="material-symbols-outlined text-[20px]">content_copy</span> Copier le Lien';
-                 }, 1500);
-             }).catch(err => {
-                 console.error('Erreur lors de la copie: ', err);
-             });
-         });
-     </script> -->
- </body>
-
- </html>
+</html>
