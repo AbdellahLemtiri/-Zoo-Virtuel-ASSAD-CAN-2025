@@ -1,17 +1,22 @@
 <?php
 session_start();
+
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+
 require_once "connect.php"; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
-    if (!isset($_SESSION['user_id'])) {
+    if (!isset($_SESSION['id'])) {
         header("Location: ../../login.php?error=Veuillez vous connecter");
         exit();
     }
 
-    $id_visite = intval($_POST['id_visite']);
-    $id_utilisateur = $_SESSION['user_id']; 
-    $nb_personnes = intval($_POST['nb_personnes']);
+    $id_visite = $_POST['id_visite'];
+    $id_utilisateur = $_SESSION['id']; 
+    $nb_personnes = $_POST['nb_personnes'];
 
    
     $sql_check = "SELECT v.capacite_max, 

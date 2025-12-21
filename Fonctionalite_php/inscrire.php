@@ -4,19 +4,19 @@ require_once "connect.php";
 session_start();
 if (
     $_SERVER['REQUEST_METHOD'] === "POST" &&
-    isset($_POST['full-name'], $_POST['role'], $_POST['reg-email'], $_POST['reg-password'])
+    isset($_POST['nom'], $_POST['role'], $_POST['email'], $_POST['password'])
 ) {
 
-    $fullName = $_POST['full-name'];
+    $fullName = $_POST['nom'];
     $role = $_POST['role'];
-    $email = $_POST['reg-email'];
-    $password = $_POST['reg-password'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
     $hashedPassword = password_hash($password,PASSWORD_DEFAULT);
     
-    $sql = "INSERT INTO utilisateurs (nom_utilisateur, role, email, motpasse_hash) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO utilisateurs (nom, role, email, motpasse_hash) VALUES (?, ?, ?, ?)";
 
-    $stmt = $conn->prepare($sql);
+    $stmt = $connect->prepare($sql);
     $stmt->bind_param("ssss", $fullName, $role, $email, $hashedPassword);
 
     if ($stmt->execute()) {

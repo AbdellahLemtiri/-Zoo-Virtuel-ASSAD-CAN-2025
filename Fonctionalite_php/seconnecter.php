@@ -1,10 +1,6 @@
 <?php
 session_start();
-
 require_once "connect.php";
-
-
-
 $email = '';
 $password = '';
 
@@ -25,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 
-        $stmt = $conn->prepare("
+        $stmt = $connect->prepare("
     SELECT id, nom, role, mot_passe_hash, approuve
     FROM utilisateurs
     WHERE email = ?
@@ -37,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
-            die("Email ou mot de passe incorrect");
+            echo("Email ou mot de passe incorrect");
         }
 
         $user = $result->fetch_assoc();
@@ -47,11 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         if ($user["role"] === "guide" && (int)$user["approuve"] === 0) {
-            header("Location: ../pages/booking_confirmation_page.php");
+            header("Location: booking.php");
             exit;
         }
 
-        $_SESSION["user_id"] = $user["id"];
+        $_SESSION["id"] = $user["id"];
         $_SESSION["nom"] = $user["nom"];
         $_SESSION["role"] = $user["role"];
 

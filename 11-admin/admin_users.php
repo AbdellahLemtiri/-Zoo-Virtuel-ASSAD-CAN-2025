@@ -1,8 +1,12 @@
 <?php
-
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('admin'); 
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+        echo $_SESSION['nom'];
 require_once 'fx/connect.php';
 
-// Récupération des utilisateurs
 $query = "SELECT id, nom, email, role, approuve FROM utilisateurs";
 $result = mysqli_query($connect, $query);
 

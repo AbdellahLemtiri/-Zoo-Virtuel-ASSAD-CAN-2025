@@ -1,37 +1,11 @@
 <?php
 
-
-
-// $_SESSION['role_utilisateur'] = "visiteur";
-// $_SESSION['logged_in'] = TRUE;
-// $_SESSION['id_utilisateur'] = 3;
-// $_SESSION['nom_utilisateur'] = "adam";
-
-// include "../Fonctionalite_php/connect.php";
-// if (
-//     // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
-//     // $_SESSION['role_utilisateur'] === "visiteur" &&
-//     // $_SESSION['logged_in'] === TRUE
-//     1
-// ) {
-//          $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
-//         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
-//         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
-
-
-//     $sql = " SELECT * FROM reservations r INNER JOIN visitesguidees v on r.id_visite = v.id_visite  and r.id_utilisateur= $id_utilisateur";
-//     $resultat = $conn->query($sql);
-
-//     $array_reservations = array();
-//     while ($ligne =  $resultat->fetch_assoc())
-//         array_push($array_reservations, $ligne);
-// } else {
-//     header("Location: ../connexion.php?error=access_denied");
-//     exit();
-// }
-
-
-
+session_start();
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('visiteur'); 
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
 
 
 ?>

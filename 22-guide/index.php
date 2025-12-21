@@ -11,6 +11,13 @@ CREATE TABLE visites_guidees (
 ); -->
 
 <?php
+// session_start();
+// require_once "../Fonctionalite_php/auth_check.php";
+// protect_page('guide'); 
+//        $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+//         $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+//         $role_utilisateur = htmlspecialchars($_SESSION['role']);
+
 require_once "../Fonctionalite_php/connect.php";
 
 $les_visite = [];

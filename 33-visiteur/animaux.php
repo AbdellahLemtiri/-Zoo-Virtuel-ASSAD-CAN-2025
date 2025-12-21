@@ -1,76 +1,12 @@
  <?php
-    //     session_start();
-    //     // $_SESSION['role_utilisateur'] = "visiteur";
-    include "../Fonctionalite_php/connect.php";
+session_start();
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('visiteur'); 
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
 
-    //     if (
-    //         // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-    //         // $_SESSION['role_utilisateur'] === "visiteur" &&
-    //         // $_SESSION['logged_in'] === TRUE 
-    //         1
-    //     ) {
-    //           $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
-    //         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
-    //         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
-
-    //         $sql = " select * from  habitats ";
-    //         $resultat = $conn->query($sql);
-
-    //         $array_habitats = array();
-    //         while ($ligne =  $resultat->fetch_assoc())
-    //             array_push($array_habitats, $ligne);
-
-    //         $sql = " select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat  ";
-    //         $resultat = $conn->query($sql);
-
-    //         $array_animaux = array();
-    //         while ($ligne =  $resultat->fetch_assoc())
-    //             array_push($array_animaux, $ligne);
-    //     } else {
-    //         header("Location: ../connexion.php?error=access_denied");
-    //         exit();
-    //     }
-
-
-
-
-    //     $sql = "SELECT a.*, h.nom_habitat 
-    //         FROM animaux a 
-    //         JOIN habitats h ON a.id_habitat = h.id_habitat 
-    //         WHERE 1=1";
-
-
-
-    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    //         if (!empty($_POST['search'])) {
-    //             $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
-    //         }
-
-    //         // filter par Habitat
-    //         if (!empty($_POST['id_habitat'])) {
-    //             $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
-    //         }
-
-    //         // Filtre par typr alimentation
-    //         if (!empty($_POST['alimentation_animal'])) {
-    //             $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
-    //         }
-    //     }
-
-    //     try {
-    //         $resultat = $conn->query($sql);
-    //         $array_animaux = array();
-    //         while ($ligne =  $resultat->fetch_assoc())
-    //             array_push($array_animaux, $ligne);
-    //     } catch (Exception $e) {
-
-    //         error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
-    //         $array_animaux = array();
-    //         while ($ligne =  $resultat->fetch_assoc())
-    //             array_push($array_animaux, $ligne);
-    //     }
-
+include "../Fonctionalite_php/connect.php";
 $animaux = [];
 
 $search = $_POST['search'] ?? '';

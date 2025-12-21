@@ -221,7 +221,7 @@
                                  </div>
                                  <input
                                      class="w-full h-12 pl-10 pr-4 bg-white dark:bg-white/5 border border-[#e7dbcf] dark:border-white/10 rounded-lg text-sm text-text-main dark:text-white placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                                     id="reg-email" name="reg-email" placeholder="nom@exemple.com" type="email" required />
+                                     id="reg-email" name="email" placeholder="nom@exemple.com" type="email" required />
                              </div>
                          </div>
 
@@ -235,7 +235,7 @@
                                  </div>
                                  <input
                                      class="w-full h-12 pl-10 pr-10 bg-white dark:bg-white/5 border border-[#e7dbcf] dark:border-white/10 rounded-lg text-sm text-text-main dark:text-white placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                                     id="reg-password" name="reg-password" placeholder="••••••••" type="password" required />
+                                     id="reg-password" name="password" placeholder="••••••••" type="password" required />
                                  <button
                                      class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main dark:hover:text-white"
                                      type="button">

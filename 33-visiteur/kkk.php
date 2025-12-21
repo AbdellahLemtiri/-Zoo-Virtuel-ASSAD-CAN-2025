@@ -1,34 +1,12 @@
 <?php
-// session_start();
+session_start();
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('visiteur'); 
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
 
-// $_SESSION['role_utilisateur'] = "visiteur";
-// include "../Fonctionalite_php/connect.php";
-
-// if (
-//     // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
-//     // $_SESSION['role_utilisateur'] === "visiteur" &&
-//     // $_SESSION['logged_in'] === TRUE*
-//     1
-// ) {
-//        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
-//         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
-//         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
-
-
-//     $sql = " select * from  animaux order by rand() limit 2";
-//     $resultat = $conn->query($sql);
-
-//     $array_animaux = array();
-//     while ($ligne =  $resultat->fetch_assoc())
-//         array_push($array_animaux, $ligne);
-// } else {
-//     header("Location: ../connexion.php?error=access_denied");
-//     exit();
-// }
-
-
-
-?>
+?> 
 
 <!DOCTYPE html>
 <html class="light" lang="fr">
@@ -154,10 +132,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <?php foreach ($array_animaux as $animal) : ?>
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg group flex items-center border border-[#f3ede7]">
-                        <img src="<?= htmlspecialchars($animal['image_url']) ?>" alt="<?= htmlspecialchars($animal['nom_animal']) ?>"
+                        <img src="<?= $animal['image_url']?>" alt="<?= $animal['nom_animal'] ?>"
                             class="w-32 h-32 object-cover shrink-0 group-hover:scale-105 transition-transform duration-300" />
                         <div class="p-4 flex-grow">
-                            <h3 class="text-xl font-bold text-[#1b140d]"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
+                            <h3 class="text-xl font-bold text-[#1b140d]"><?= $animal['nom_animal']?></h3>
                             <p class="text-gray-500 text-sm mb-3">Découvrez son habitat et son statut de conservation.</p>
                             <a href="animaux.php" class="text-primary text-sm font-bold hover:underline">
                                 Voir la fiche complète &rarr;

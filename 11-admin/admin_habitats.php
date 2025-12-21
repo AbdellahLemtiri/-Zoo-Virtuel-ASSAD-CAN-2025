@@ -1,4 +1,9 @@
 <?php
+// require_once "../Fonctionalite_php/auth_check.php";
+// protect_page('admin'); 
+//        $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+//         $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+//         $role_utilisateur = htmlspecialchars($_SESSION['role']);
 require_once "fx/connect.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {

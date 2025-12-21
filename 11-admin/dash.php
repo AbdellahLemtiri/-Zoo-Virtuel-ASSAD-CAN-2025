@@ -1,11 +1,10 @@
 <?php
 session_start();
-
-// Protection : seul l'admin peut accéder à cette page
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
-    exit();
-}
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('admin'); 
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
 
 $nom_utilisateur = htmlspecialchars($_SESSION['nom'] ?? 'Admin');
 $current_page = basename($_SERVER['PHP_SELF']);

@@ -1,4 +1,11 @@
 <?php
+session_start();
+require_once "../Fonctionalite_php/auth_check.php";
+protect_page('guide'); 
+       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
+        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
+        $role_utilisateur = htmlspecialchars($_SESSION['role']);
+
 require_once "../Fonctionalite_php/connect.php";
 $reservation = [];
 $sql = "SELECT res.* , vg.titre,vg.id as idv,utl.nom ,vg.date_heure FROM  reservations res  inner join visites_guidees vg on res.id =  vg.id  inner join utilisateurs utl on res.id_utilisateur = utl.id ";
