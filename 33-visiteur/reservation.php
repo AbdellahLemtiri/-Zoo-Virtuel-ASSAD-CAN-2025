@@ -72,25 +72,24 @@
     // }
 
 
+    include "../Fonctionalite_php/connect.php";
 
-
-$sql_guides = "SELECT id, nom FROM utilisateurs WHERE role = 'Guide' AND approuve = 1";
+$sql_guides = "SELECT id, nom FROM utilisateurs WHERE role = 'guide' AND approuve = 1";
 $res_guides = $connect->query($sql_guides);
 $array_guides = $res_guides->fetch_all(MYSQLI_ASSOC);
 
-$where_clause = "WHERE v.statut = 'disponible'"; 
+$where_clause = "WHERE v.statut = 'ouverte'"; 
 
 $sql_visites = "SELECT v.*, 
-                (v.capacite_max - COALESCE(SUM(r.nbpersonnes), 0)) AS places_restantes
-                FROM visitesguidees v
-                LEFT JOIN reservations r ON v.id_visite = r.idvisite
+                (v.capacite_max - COALESCE(SUM(r.nb_personnes), 0)) AS places_restantes
+                FROM visites_guidees v
+                LEFT JOIN reservations r ON v.id = r.id_visite
                 $where_clause
-                GROUP BY v.id_visite
-                ORDER BY v.dateheure ASC";
+                GROUP BY v.id
+                ORDER BY v.date_heure ASC";
 
 $res_visites = $connect->query($sql_visites);
 $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
-
     ?>
 
  <!DOCTYPE html>
@@ -169,7 +168,7 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
      </header>
 
  <?php foreach ($array_visites as $visit) : 
-    $date_visite = strtotime($visit['dateheure']); 
+    $date_visite = strtotime($visit['date_heure']); 
     $maintenant = time();
     $places_restantes = $visit['places_restantes'];
     $is_full = $places_restantes <= 0;
@@ -212,12 +211,12 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <div class="flex flex-wrap gap-3 mt-auto pt-2 border-t border-gray-100">
-                <a href="visite_details.php?id=<?= $visit['id_visite'] ?>" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors">
+                <a href="visite_details.php?id=<?= $visit['id'] ?>" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors">
                     <span class="material-symbols-outlined text-[18px]">visibility</span> Détails
                 </a>
 
                 <?php if (!$is_full && isset($_SESSION['user_id'])) : ?>
-                    <button onclick="openBookingModal(<?= $visit['id_visite'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
+                    <button onclick="openBookingModal(<?= $visit['id'] ?>, '<?= addslashes($visit['titre']) ?>', <?= $places_restantes ?>)" 
                             class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-orange-600 transition-colors">
                         <span class="material-symbols-outlined text-[18px]">confirmation_number</span> Réserver
                     </button>
@@ -228,7 +227,7 @@ $array_visites = $res_visites->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 <?php endforeach; ?>
-
+<div style="height: 200px;"></div>
      <footer class="bg-[#1b140d] text-white pt-16 pb-8 mt-auto">
          <div class="max-w-[1200px] mx-auto px-4 md:px-10">
              <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
