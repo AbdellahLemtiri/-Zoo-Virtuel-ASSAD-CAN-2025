@@ -14,21 +14,22 @@ if (
 
     $hashedPassword = password_hash($password,PASSWORD_DEFAULT);
     
-    $sql = "INSERT INTO utilisateurs (nom, role, email, motpasse_hash) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO utilisateurs (nom, role, email, mot_passe_hash) VALUES (?, ?, ?, ?)";
 
     $stmt = $connect->prepare($sql);
     $stmt->bind_param("ssss", $fullName, $role, $email, $hashedPassword);
 
     if ($stmt->execute()) {
-        header("Location: ../connexion.php?message=user_added");
+        
+        header("Location: ../index.php?message=user_added");
     } else {
-        header("Location: ../connexion.php?error=4");
+        header("Location: ../index.php?error=4");
     }
 
     $stmt->close();
 } else {
 
-    header("Location: ../connexion.php?error=1");
+    header("Location: ../index.php?error=1");
     exit();
 
 }
