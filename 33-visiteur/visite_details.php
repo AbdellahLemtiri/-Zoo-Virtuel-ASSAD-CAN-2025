@@ -1,42 +1,43 @@
  <?php
 
-    $image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
+//     $image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
     
-    session_start();
-    $_SESSION['role_utilisateur'] = "visiteur";
-include "../Fonctionalite_php/connect.php";
+//     session_start();
+//     // $_SESSION['role_utilisateur'] = "visiteur";
+// include "../Fonctionalite_php/connect.php";
 
-    if (
-        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-        $_SESSION['role_utilisateur'] === "visiteur" &&
-        $_SESSION['logged_in'] === TRUE
-    ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
-        $tour_id = $_GET['id'];
+//     if (
+//         // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
+//         // $_SESSION['role_utilisateur'] === "visiteur" &&
+//         // $_SESSION['logged_in'] === TRUE
+//         1
+//     ) {
+//            $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
+//         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
+//         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
+//         $tour_id = $_GET['id'];
 
-        $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =  id_guide and id_visite = $tour_id";
-        $resultat = $conn->query($sql);
+//         $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =  id_guide and id_visite = $tour_id";
+//         $resultat = $conn->query($sql);
 
-        $tour = array();
-        if ($resultat->num_rows == 1) {
-            $tour = $resultat->fetch_assoc();
-            $sql = " select * from  visitesguidees v inner join  etapesvisite e on v.id_visite= e.id_visite   and v.id_visite = $tour_id";
-            $resultat = $conn->query($sql);
-            $array_etapes = array();
-            while ($ligne =  $resultat->fetch_assoc())
-                array_push($array_etapes, $ligne);
+//         $tour = array();
+//         if ($resultat->num_rows == 1) {
+//             $tour = $resultat->fetch_assoc();
+//             $sql = " select * from  visitesguidees v inner join  etapesvisite e on v.id_visite= e.id_visite   and v.id_visite = $tour_id";
+//             $resultat = $conn->query($sql);
+//             $array_etapes = array();
+//             while ($ligne =  $resultat->fetch_assoc())
+//                 array_push($array_etapes, $ligne);
 
-            $sql = " select sum(r.nb_personnes) as nb_participants from  visitesguidees v inner join  reservations r   on r.id_visite= v.id_visite
-                    inner join  utilisateurs u   on u.id_utilisateur= v.id_guide where  v.id_visite = $tour_id  ";
-            $resultat = $conn->query($sql);
-            $nb_participants = $resultat->fetch_assoc()["nb_participants"];
-        }
-    } else {
-        header("Location: ../connexion.php?error=access_denied");
-        exit();
-    }
+//             $sql = " select sum(r.nb_personnes) as nb_participants from  visitesguidees v inner join  reservations r   on r.id_visite= v.id_visite
+//                     inner join  utilisateurs u   on u.id_utilisateur= v.id_guide where  v.id_visite = $tour_id  ";
+//             $resultat = $conn->query($sql);
+//             $nb_participants = $resultat->fetch_assoc()["nb_participants"];
+//         }
+//     } else {
+//         header("Location: ../connexion.php?error=access_denied");
+//         exit();
+//     }
 
 
 

@@ -1,74 +1,75 @@
  <?php
-    session_start();
-    $_SESSION['role_utilisateur'] = "visiteur";
-    include "../Fonctionalite_php/connect.php";
+    // session_start();
+    // $_SESSION['role_utilisateur'] = "visiteur";
+    // include "../Fonctionalite_php/connect.php";
 
-    if (
-        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-        $_SESSION['role_utilisateur'] === "visiteur" &&
-        $_SESSION['logged_in'] === TRUE
-    ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+    // if (
+    //     // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
+    //     // $_SESSION['role_utilisateur'] === "visiteur" &&
+    //     // $_SESSION['logged_in'] === TRUE
+    //     1
+    // ) {
+    //     $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
+    //     $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
+    //     $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
 
-        $sql = " select * from  utilisateurs where role='guide' ";
-        $resultat = $conn->query($sql);
+    //     $sql = " select * from  utilisateurs where role='guide' ";
+    //     $resultat = $conn->query($sql);
 
-        $array_guides = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_guides, $ligne);
+    //     $array_guides = array();
+    //     while ($ligne =  $resultat->fetch_assoc())
+    //         array_push($array_guides, $ligne);
 
-        $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =id_guide  ";
-        $resultat = $conn->query($sql);
+    //     $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =id_guide  ";
+    //     $resultat = $conn->query($sql);
 
-        $array_visites = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_visites, $ligne);
-    } else {
-        header("Location: ../connexion.php?error=access_denied");
-        exit();
-    }
-
-
-
-
-    $sql = "SELECT a.*, h.nom_habitat 
-        FROM animaux a 
-        JOIN habitats h ON a.id_habitat = h.id_habitat 
-        WHERE 1=1";
+    //     $array_visites = array();
+    //     while ($ligne =  $resultat->fetch_assoc())
+    //         array_push($array_visites, $ligne);
+    // } else {
+    //     header("Location: ../connexion.php?error=access_denied");
+    //     exit();
+    // }
 
 
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        if (!empty($_POST['search'])) {
-            $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
-        }
+    // $sql = "SELECT a.*, h.nom_habitat 
+    //     FROM animaux a 
+    //     JOIN habitats h ON a.id_habitat = h.id_habitat 
+    //     WHERE 1=1";
 
-        // filter par Habitat
-        if (!empty($_POST['id_habitat'])) {
-            $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
-        }
 
-        // Filtre par typr alimentation
-        if (!empty($_POST['alimentation_animal'])) {
-            $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
-        }
-    }
 
-    try {
-        $resultat = $conn->query($sql);
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    } catch (Exception $e) {
+    // if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    }
+    //     if (!empty($_POST['search'])) {
+    //         $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
+    //     }
+
+    //     // filter par Habitat
+    //     if (!empty($_POST['id_habitat'])) {
+    //         $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
+    //     }
+
+    //     // Filtre par typr alimentation
+    //     if (!empty($_POST['alimentation_animal'])) {
+    //         $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
+    //     }
+    // }
+
+    // try {
+    //     $resultat = $conn->query($sql);
+    //     $array_animaux = array();
+    //     while ($ligne =  $resultat->fetch_assoc())
+    //         array_push($array_animaux, $ligne);
+    // } catch (Exception $e) {
+
+    //     error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
+    //     $array_animaux = array();
+    //     while ($ligne =  $resultat->fetch_assoc())
+    //         array_push($array_animaux, $ligne);
+    // }
 
 
 

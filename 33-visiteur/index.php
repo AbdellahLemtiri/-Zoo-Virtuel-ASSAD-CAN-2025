@@ -1,29 +1,30 @@
 <?php
-session_start();
+// session_start();
 
-$_SESSION['role_utilisateur'] = "visiteur";
-include "../Fonctionalite_php/connect.php";
+// $_SESSION['role_utilisateur'] = "visiteur";
+// include "../Fonctionalite_php/connect.php";
 
-if (
-    isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
-    $_SESSION['role_utilisateur'] === "visiteur" &&
-    $_SESSION['logged_in'] === TRUE
-) {
-    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-    $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+// if (
+//     // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
+//     // $_SESSION['role_utilisateur'] === "visiteur" &&
+//     // $_SESSION['logged_in'] === TRUE*
+//     1
+// ) {
+//        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
+//         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
+//         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
 
 
-    $sql = " select * from  animaux order by rand() limit 2";
-    $resultat = $conn->query($sql);
+//     $sql = " select * from  animaux order by rand() limit 2";
+//     $resultat = $conn->query($sql);
 
-    $array_animaux = array();
-    while ($ligne =  $resultat->fetch_assoc())
-        array_push($array_animaux, $ligne);
-} else {
-    header("Location: ../connexion.php?error=access_denied");
-    exit();
-}
+//     $array_animaux = array();
+//     while ($ligne =  $resultat->fetch_assoc())
+//         array_push($array_animaux, $ligne);
+// } else {
+//     header("Location: ../connexion.php?error=access_denied");
+//     exit();
+// }
 
 
 

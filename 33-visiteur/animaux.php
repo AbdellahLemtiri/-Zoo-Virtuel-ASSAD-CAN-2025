@@ -1,83 +1,111 @@
  <?php
-    session_start();
-    $_SESSION['role_utilisateur'] = "visiteur";
-include "../Fonctionalite_php/connect.php";
+    //     session_start();
+    //     // $_SESSION['role_utilisateur'] = "visiteur";
+    include "../Fonctionalite_php/connect.php";
 
-    if (
-        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-        $_SESSION['role_utilisateur'] === "visiteur" &&
-        $_SESSION['logged_in'] === TRUE
-    ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+    //     if (
+    //         // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
+    //         // $_SESSION['role_utilisateur'] === "visiteur" &&
+    //         // $_SESSION['logged_in'] === TRUE 
+    //         1
+    //     ) {
+    //           $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']) ?? "a";
+    //         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur'])?? "a";
+    //         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur'])?? "a";
 
-        $sql = " select * from  habitats ";
-        $resultat = $conn->query($sql);
+    //         $sql = " select * from  habitats ";
+    //         $resultat = $conn->query($sql);
 
-        $array_habitats = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_habitats, $ligne);
+    //         $array_habitats = array();
+    //         while ($ligne =  $resultat->fetch_assoc())
+    //             array_push($array_habitats, $ligne);
 
-        $sql = " select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat  ";
-        $resultat = $conn->query($sql);
+    //         $sql = " select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat  ";
+    //         $resultat = $conn->query($sql);
 
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    } else {
-        header("Location: ../connexion.php?error=access_denied");
-        exit();
-    }
-
-
-
-
-    $sql = "SELECT a.*, h.nom_habitat 
-        FROM animaux a 
-        JOIN habitats h ON a.id_habitat = h.id_habitat 
-        WHERE 1=1";
-
-
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-        if (!empty($_POST['search'])) {
-            $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
-        }
-
-        // filter par Habitat
-        if (!empty($_POST['id_habitat'])) {
-            $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
-        }
-
-        // Filtre par typr alimentation
-        if (!empty($_POST['alimentation_animal'])) {
-            $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
-        }
-    }
-
-    try {
-        $resultat = $conn->query($sql);
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    } catch (Exception $e) {
-
-        error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    }
-    ?>
+    //         $array_animaux = array();
+    //         while ($ligne =  $resultat->fetch_assoc())
+    //             array_push($array_animaux, $ligne);
+    //     } else {
+    //         header("Location: ../connexion.php?error=access_denied");
+    //         exit();
+    //     }
 
 
 
 
+    //     $sql = "SELECT a.*, h.nom_habitat 
+    //         FROM animaux a 
+    //         JOIN habitats h ON a.id_habitat = h.id_habitat 
+    //         WHERE 1=1";
+
+
+
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    //         if (!empty($_POST['search'])) {
+    //             $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
+    //         }
+
+    //         // filter par Habitat
+    //         if (!empty($_POST['id_habitat'])) {
+    //             $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
+    //         }
+
+    //         // Filtre par typr alimentation
+    //         if (!empty($_POST['alimentation_animal'])) {
+    //             $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
+    //         }
+    //     }
+
+    //     try {
+    //         $resultat = $conn->query($sql);
+    //         $array_animaux = array();
+    //         while ($ligne =  $resultat->fetch_assoc())
+    //             array_push($array_animaux, $ligne);
+    //     } catch (Exception $e) {
+
+    //         error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
+    //         $array_animaux = array();
+    //         while ($ligne =  $resultat->fetch_assoc())
+    //             array_push($array_animaux, $ligne);
+    //     }
+
+$animaux =[];
+
+$search = $_POST['search'] ?? '';
+$id_habitat = $_POST['id_habitat'] ?? '';
+$pays = $_POST['pays'] ?? '';
+
+$sql = "
+SELECT a.*, h.nom as nom_habitat
+FROM animaux a
+LEFT JOIN habitats h ON a.id_habitat = h.id
+
+";
+
+if (!empty($search)) {
+    $sql .= " AND a.nom LIKE '%$search%'";
+}
+
+if (!empty($id_habitat)) {
+    $id_habitat = (int)$id_habitat;
+    $sql .= " AND a.id_habitat = $id_habitat";
+}
+
+if (!empty($pays)) {
+    $sql .= " AND a.pays_origine = '$pays'";
+}
+
+$sql .= " ORDER BY (a.nom = 'Asaad') DESC, a.nom";
+ $res = $connect->query($sql);
+ if($res){
+   $animaux = $res->fetch_all(MYSQLI_ASSOC);
+ }
+?>
 
 
  <!DOCTYPE html>
-
  <html class="light" lang="fr">
 
  <head>
@@ -85,46 +113,70 @@ include "../Fonctionalite_php/connect.php";
      <meta content="width=device-width, initial-scale=1.0" name="viewport" />
      <title>Liste des Animaux - Zoo Virtuel ASSAD</title>
      <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
-     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
-   <script id="tailwind-config">
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    primary: "#0d9488",          // Teal واعر مودرن
-                    "primary-dark": "#0f766e",
-                    "primary-light": "#2dd4bf",
-                    "background-light": "#f0fdfa",
-                    "background-dark": "#042f2e",
-                    "surface-light": "#ffffff",
-                    "surface-dark": "#134e4a",
-                    "text-light": "#164e63",
-                    "text-dark": "#a7f3d0",
-                    "text-secondary-light": "#0891b2",
-                    "text-secondary-dark": "#5eead4",
-                    "accent": "#f59e0b"          // لمسة ذهبية
-                },
-                fontFamily: {
-                    sans: ["Plus Jakarta Sans", "sans-serif"]
-                },
-                animation: {
-                    'fade-in': 'fadeIn 0.7s ease-out forwards',
-                    'slide-up': 'slideUp 0.8s ease-out forwards',
-                    'pulse-glow': 'pulseGlow 2s infinite'
-                },
-                keyframes: {
-                    fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                    slideUp: { '0%': { transform: 'translateY(60px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                    pulseGlow: { '0%, 100%': { boxShadow: '0 0 20px rgba(13,148,136,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(13,148,136,0.6)' } }
-                }
-            }
-        }
-    }
-</script>
+     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+     <script id="tailwind-config">
+         tailwind.config = {
+             darkMode: "class",
+             theme: {
+                 extend: {
+                     colors: {
+                         primary: "#0d9488",
+                         "primary-dark": "#0f766e",
+                         "primary-light": "#2dd4bf",
+                         "background-light": "#f0fdfa",
+                         "background-dark": "#042f2e",
+                         "surface-light": "#ffffff",
+                         "surface-dark": "#134e4a",
+                         "text-light": "#164e63",
+                         "text-dark": "#a7f3d0",
+                         "text-secondary-light": "#0891b2",
+                         "text-secondary-dark": "#5eead4",
+                         "accent": "#f59e0b"
+                     },
+                     fontFamily: {
+                         sans: ["Plus Jakarta Sans", "sans-serif"]
+                     },
+                     animation: {
+                         'fade-in': 'fadeIn 0.7s ease-out forwards',
+                         'slide-up': 'slideUp 0.8s ease-out forwards',
+                         'pulse-glow': 'pulseGlow 2s infinite'
+                     },
+                     keyframes: {
+                         fadeIn: {
+                             '0%': {
+                                 opacity: '0'
+                             },
+                             '100%': {
+                                 opacity: '1'
+                             }
+                         },
+                         slideUp: {
+                             '0%': {
+                                 transform: 'translateY(60px)',
+                                 opacity: '0'
+                             },
+                             '100%': {
+                                 transform: 'translateY(0)',
+                                 opacity: '1'
+                             }
+                         },
+                         pulseGlow: {
+                             '0%, 100%': {
+                                 boxShadow: '0 0 20px rgba(13,148,136,0.3)'
+                             },
+                             '50%': {
+                                 boxShadow: '0 0 40px rgba(13,148,136,0.6)'
+                             }
+                         }
+                     }
+                 }
+             }
+         }
+     </script>
+
      <style>
-         /* Style pour Badge de Statut */
          .status-badge-critical {
              background-color: #fef2f2;
              color: #ef4444;
@@ -172,22 +224,20 @@ include "../Fonctionalite_php/connect.php";
                      <div class="text-primary">
                          <span class="material-symbols-outlined text-4xl">pets</span>
                      </div>
-                     <h2 class="text-[#1b140d] text-lg font-bold leading-tight tracking-[-0.015em]">Zoo Virtuel ASSAD
+                     <h2 class="text-[#1b140d] text-lg font-bold leading-tight tracking-[-0.015em]">
+                         Zoo Virtuel ASSAD
                      </h2>
                  </div>
+
                  <div class="hidden lg:flex flex-1 justify-end gap-8">
                      <div class="flex items-center gap-9">
-                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="index.php">Accueil</a>
-                         <a class="text-primary text-sm font-bold hover:text-primary transition-colors"
-                             href="animaux.php">Animaux</a>
-                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="reservation.php">Réservation</a>
-                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="#">CAN 2025</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors" href="index.php">Accueil</a>
+                         <a class="text-primary text-sm font-bold hover:text-primary transition-colors" href="animaux.php">Animaux</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors" href="reservation.php">Réservation</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors" href="#">CAN 2025</a>
                      </div>
-
                  </div>
+
                  <button class="lg:hidden text-[#1b140d]">
                      <span class="material-symbols-outlined">menu</span>
                  </button>
@@ -197,11 +247,9 @@ include "../Fonctionalite_php/connect.php";
 
      <main class="flex-grow flex flex-col items-center">
          <div class="w-full max-w-[1200px] px-4 md:px-10 py-6">
-             <div
-                 class="rounded-xl overflow-hidden relative min-h-[250px] flex flex-col justify-center items-center text-center p-8 bg-cover bg-center shadow-xl shadow-primary/10"
+             <div class="rounded-xl overflow-hidden relative min-h-[250px] flex flex-col justify-center items-center text-center p-8 bg-cover bg-center shadow-xl shadow-primary/10"
                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7tV0MbXCZTrttbfuFt8CqKgYEiMryvuxkVWJ6WjvseE_KC2bRS8wOCXpRA4lgDfHgikgjgeCdHsMWdoTr4UFYTYVRoaXexOq-BoOXf5Yo4UcENg5bt1enOCEyrAifv40q_DFANZ1CKEoehRrYDWpLP4S40C7IO1NzrxJat8xe6LbEld6MWZxqsFZoxikvEa865GjFKpz8yY8X5kFjlAlJsm2eNUry4Us0zUZHNEz_wQNZStdhBmsEhv7mpEWzSrjunYXj4bxh4v0h");'>
-                 <h1
-                     class="text-white text-4xl md:text-5xl font-black leading-tight tracking-tight mb-4 max-w-3xl drop-shadow-lg">
+                 <h1 class="text-white text-4xl md:text-5xl font-black leading-tight tracking-tight mb-4 max-w-3xl drop-shadow-lg">
                      Découvrez tous nos Résidents Étoiles
                  </h1>
                  <p class="text-white/90 text-base md:text-lg font-medium max-w-2xl drop-shadow-md mb-8">
@@ -210,128 +258,149 @@ include "../Fonctionalite_php/connect.php";
              </div>
          </div>
 
-         <form action="" method="POST" class="w-full max-w-[1200px] px-4 md:px-10 sticky top-[65px] z-40">
-             <div class="bg-white/80 backdrop-blur-xl shadow-sm border border-[#f3ede7] rounded-xl p-4 mb-8">
-                 <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
-                     <div class="w-full md:w-1/3 relative group">
-                         <button class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                             <span class="material-symbols-outlined text-gray-400 group-focus-within:text-primary transition-colors">search</span>
-                         </button>
-                         <input name="search"
-                             class="w-full pl-10 pr-4 py-2.5 bg-[#f8f7f6] border-none rounded-lg text-sm text-[#1b140d] placeholder-gray-500 focus:ring-2 focus:ring-primary focus:bg-white transition-all"
-                             placeholder="Rechercher (ex: Lion, Éléphant...)" type="text" />
-                     </div>
-                     <div class="flex gap-4 overflow-x-auto pb-2 md:pb-0 w-full md:w-2/3 scrollbar-hide">
-                         <select name="id_habitat"
-                             class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/2">
-                             <option value="">Filtrer par Habitat</option>
-                             <?php foreach ($array_habitats as $habitat) : ?>
-                                 <option value="<?= htmlspecialchars($habitat["id_habitat"]) ?>"><?= htmlspecialchars($habitat["nom_habitat"]) ?></option>
-                             <?php endforeach; ?>
-                         </select>
-                         <select name="alimentation_animal"
-                             class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/2">
-                             <option value="Tout-Type-Alimentaire" selected>Tout Type Alimentaire</option>
-                             <option value="Carnivore">Carnivore</option>
-                             <option value="Herbivore">Herbivore</option>
-                             <option value="Omnivore">Omnivore</option>
-                         </select>
-                     </div>
-                 </div>
-             </div>
-         </form>
+      <form action="" method="POST"
+      class="w-full max-w-[1200px] px-4 md:px-10 sticky top-[65px] z-40">
+
+  <div class="bg-white/80 backdrop-blur-xl shadow-sm border border-[#f3ede7] rounded-xl p-4 mb-8">
+    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+
+      <!-- 🔍 Search -->
+      <div class="w-full md:w-1/3 relative group">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-gray-400 group-focus-within:text-primary transition-colors">
+            search
+          </span>
+        </span>
+        <input
+          name="search"
+          type="text"
+          placeholder="Rechercher (ex: Lion, Éléphant...)"
+          class="w-full pl-10 pr-4 py-2.5 bg-[#f8f7f6] border-none rounded-lg text-sm text-[#1b140d] placeholder-gray-500 focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+        />
+      </div>
+
+      <!-- 🌿 Habitat + 🌍 Pays -->
+      <div class="flex gap-4 overflow-x-auto pb-2 md:pb-0 w-full md:w-2/3 scrollbar-hide">
+
+        <select
+          name="id_habitat"
+          class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/3">
+          <option value="">Filtrer par Habitat</option>
+          <option value="1">Savane Africaine</option>
+          <option value="2">Forêt Tropicale</option>
+          <option value="3">Désert</option>
+          <option value="4">Zone Aquatique</option>
+          <option value="5">Montagne</option>
+        </select>
+
+        <select
+          name="pays"
+          class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/3">
+          <option value="">Pays africain</option>
+          <option value="Maroc">Maroc</option>
+          <option value="Kenya">Kenya</option>
+          <option value="Afrique du Sud">Afrique du Sud</option>
+          <option value="Tanzanie">Tanzanie</option>
+          <option value="Égypte">Égypte</option>
+        </select>
+
+        <!-- 🔘 Button -->
+        <button
+          type="submit"
+          class="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-all shadow-sm hover:shadow-md whitespace-nowrap w-full sm:w-1/3">
+          Filtrer
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</form>
+
+
 
          <div class="w-full max-w-[1200px] px-4 md:px-10 mb-6 flex justify-between items-end">
              <div>
                  <h2 class="text-[#1b140d] text-2xl font-bold leading-tight">Liste des Animaux</h2>
-                 <p class="text-gray-500 text-sm mt-1">Total: <?= count($array_animaux) ?> animaux répertoriés</p>
+                 <p class="text-gray-500 text-sm mt-1">Total: 12 animaux répertoriés</p>
              </div>
          </div>
 
          <div class="w-full max-w-[1200px] px-4 md:px-10 pb-20">
              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                 <?php foreach ($array_animaux as $index => $animal) : ?>
-                     <?php
-                        $status = $animal['alimentation_animal'];
-                        $badge_class = '';
-                        if (strtolower($status) === 'carnivore') {
-                            $badge_class = 'status-badge-critical';
-                        } elseif (strtolower($status) === 'herbivore') {
-                            $badge_class = 'status-badge-danger';
-                        } elseif (strtolower($status) === 'omnivore') {
-                            $badge_class = 'status-badge-vulnerable';
-                        }
-                        ?>
+                 <!-- Featured (index 0) -->
+                 <div class="group relative flex flex-col bg-white rounded-2xl border-2 border-primary overflow-hidden hover:shadow-xl transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-2">
+                     <div class="absolute top-4 left-4 z-10">
+                         <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold shadow-lg">
+                             <span class="material-symbols-outlined text-[16px]">stars</span>
+                             Carnivore
+                         </span>
+                     </div>
 
-                     <?php if ($index === 0) :
-                        ?>
-                         <div class="group relative flex flex-col bg-white rounded-2xl border-2 border-primary overflow-hidden hover:shadow-xl transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-2">
-                             <div class="absolute top-4 left-4 z-10">
-                                 <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold shadow-lg">
-                                     <span class="material-symbols-outlined text-[16px]">stars</span>
-                                     <?= htmlspecialchars($animal['alimentation_animal']) ?>
+                     <a href="animal_detail.php?id=1" class="h-64 md:h-full w-full overflow-hidden relative">
+                         <img alt="Asaad - Lion de l'Atlas"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1200&q=80" />
+                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                         <div class="absolute bottom-4 left-4 text-white">
+                             <h3 class="text-2xl font-bold">Asaad</h3>
+                             <p class="text-white/80 text-sm">Lion de l’Atlas</p>
+                         </div>
+                     </a>
+
+                     <div class="p-4 flex justify-between items-center bg-primary/5 border-t border-primary/10">
+                         <div class="flex items-center gap-2 text-sm font-medium text-[#1b140d]">
+                             <span class="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-xs">🇲🇦</span>
+                             Maroc
+                         </div>
+                         <a href="animal_detail.php?id=1" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                             En savoir plus
+                             <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                         </a>
+                     </div>
+                 </div>
+
+                 <?php foreach ($animaux as $anm): ?>
+                     <div class="group flex flex-col bg-white rounded-2xl border border-[#f3ede7] overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                         <a href="animal_detail.php?id=2" class="h-48 overflow-hidden relative">
+                             <img alt="Éléphant d'Afrique"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 src="<?= $anm['image'] ?>" />
+                             <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-sm text-gray-500">
+                                 <span class="material-symbols-outlined text-[18px]">favorite</span>
+                             </div>
+                         </a>
+                         <div class="p-4 flex flex-col flex-grow">
+                             <div class="flex items-start justify-between mb-2">
+                                 <div>
+                                     <h3 class="text-lg font-bold text-[#1b140d]"><?= $anm['nom'] ?></h3>
+                                     <p class="text-xs text-gray-500 italic"><?= $anm['espece'] ?></p>
+                                 </div>
+                             </div>
+                             <div class="flex flex-wrap gap-2 mt-2">
+                                 <span class="inline-flex items-center px-2 py-1 rounded bg-[#f8f7f6] text-xs font-medium text-gray-600">
+                                     <?= $anm['nom_habitat'] ?>
+                                 </span>
+                                 <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium status-badge-danger">
+                                     <?= $anm['alimentation'] ?>
                                  </span>
                              </div>
-                             <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="h-64 md:h-full w-full overflow-hidden relative">
-                                 <img alt="<?= htmlspecialchars($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<?= htmlspecialchars($animal['image_url']) ?>" />
-                                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                                 <div class="absolute bottom-4 left-4 text-white">
-                                     <h3 class="text-2xl font-bold"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
-                                     <p class="text-white/80 text-sm"><?= htmlspecialchars($animal['espece']) ?></p>
+                             <div class="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
+                                 <div class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                                     <span class="material-symbols-outlined text-[16px] text-gray-400">location_on</span>
+                                     <?= $anm['pays_origine'] ?>
                                  </div>
-                             </a>
-                             <div class="p-4 flex justify-between items-center bg-primary/5 border-t border-primary/10">
-                                 <div class="flex items-center gap-2 text-sm font-medium text-[#1b140d]">
-                                     <span class="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-xs">🇲🇦</span>
-                                     <?= htmlspecialchars($animal['pays_origine']) ?>
-                                 </div>
-                                 <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                                     En savoir plus
+                                 <a href="animal_detail.php?id=2" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                     Détails
                                      <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                                  </a>
                              </div>
                          </div>
-                     <?php else : // Cartes régulières 
-                        ?>
-                         <div class="group flex flex-col bg-white rounded-2xl border border-[#f3ede7] overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                             <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="h-48 overflow-hidden relative">
-                                 <img alt="<?= htmlspecialchars($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="<?= htmlspecialchars($animal['image_url']) ?>" />
-                                 <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-sm text-gray-500">
-                                     <span class="material-symbols-outlined text-[18px]">favorite</span>
-                                 </div>
-                             </a>
-                             <div class="p-4 flex flex-col flex-grow">
-                                 <div class="flex items-start justify-between mb-2">
-                                     <div>
-                                         <h3 class="text-lg font-bold text-[#1b140d]"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
-                                         <p class="text-xs text-gray-500 italic"><?= htmlspecialchars($animal['espece']) ?></p>
-                                     </div>
-                                 </div>
-                                 <div class="flex flex-wrap gap-2 mt-2">
-                                     <span class="inline-flex items-center px-2 py-1 rounded bg-[#f8f7f6] text-xs font-medium text-gray-600">
-                                         <?= htmlspecialchars($animal['nom_habitat']) ?>
-                                     </span>
-                                     <?php if ($badge_class): ?>
-                                         <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium <?= $badge_class ?>">
-                                             <?= htmlspecialchars($animal['alimentation_animal']) ?>
-                                         </span>
-                                     <?php endif; ?>
-                                 </div>
-                                 <div class="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
-                                     <div class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
-                                         <span class="material-symbols-outlined text-[16px] text-gray-400">location_on</span>
-                                         <?= htmlspecialchars($animal['pays_origine']) ?>
-                                     </div>
-                                     <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                                         Détails
-                                         <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                                     </a>
-                                 </div>
-                             </div>
-                         </div>
-                     <?php endif; ?>
+                     </div>
                  <?php endforeach; ?>
+
+
              </div>
 
              <div class="flex justify-center mt-12">
@@ -347,6 +416,7 @@ include "../Fonctionalite_php/connect.php";
      <footer class="bg-[#1b140d] text-white pt-16 pb-8 mt-auto">
          <div class="max-w-[1200px] mx-auto px-4 md:px-10">
              <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+
                  <div class="col-span-1 md:col-span-1">
                      <div class="flex items-center gap-3 mb-6">
                          <div class="text-primary">
@@ -358,6 +428,7 @@ include "../Fonctionalite_php/connect.php";
                          Le premier zoo virtuel dédié à la faune africaine. Soutenez la conservation et célébrez la CAN 2025 avec nous.
                      </p>
                  </div>
+
                  <div>
                      <h4 class="font-bold mb-4 text-white">Explorer</h4>
                      <ul class="space-y-3 text-gray-400 text-sm">
@@ -366,6 +437,7 @@ include "../Fonctionalite_php/connect.php";
                          <li><a class="hover:text-primary transition-colors" href="#">Programme Éducatif</a></li>
                      </ul>
                  </div>
+
                  <div>
                      <h4 class="font-bold mb-4 text-white">CAN 2025</h4>
                      <ul class="space-y-3 text-gray-400 text-sm">
@@ -374,6 +446,7 @@ include "../Fonctionalite_php/connect.php";
                          <li><a class="hover:text-primary transition-colors" href="#">Partenaires</a></li>
                      </ul>
                  </div>
+
                  <div>
                      <h4 class="font-bold mb-4 text-white">Newsletter</h4>
                      <p class="text-gray-400 text-sm mb-4">Restez informé des naissances et des matchs.</p>
@@ -386,7 +459,9 @@ include "../Fonctionalite_php/connect.php";
                          </button>
                      </div>
                  </div>
+
              </div>
+
              <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                  <p class="text-gray-500 text-xs">© 2025 Zoo Virtuel ASSAD. Tous droits réservés.</p>
                  <div class="flex gap-6 text-gray-500 text-xs">
@@ -395,8 +470,10 @@ include "../Fonctionalite_php/connect.php";
                      <a class="hover:text-white transition-colors" href="#">Cookies</a>
                  </div>
              </div>
+
          </div>
      </footer>
+
  </body>
 
  </html>

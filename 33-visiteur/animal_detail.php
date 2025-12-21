@@ -1,36 +1,37 @@
-<?php
+<!-- <?php
 
-$animal_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+// $animal_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
 
-if ($animal_id) {
+// if ($animal_id) {
 
-    session_start();
-include "../Fonctionalite_php/connect.php";
+//     session_start();
+// include "../Fonctionalite_php/connect.php";
 
-    if (
-        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
-        $_SESSION['role_utilisateur'] === "visiteur" &&
-        $_SESSION['logged_in'] === TRUE
-    ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+    // if (
+        // isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
+        // $_SESSION['role_utilisateur'] === "visiteur" &&
+        // $_SESSION['logged_in'] === TRUE
+        1
+    // ) {
+        // $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
 
 
 
-        $sql = " SELECT * FROM animaux a INNER JOIN habitats h on a.id_habitat= h.id_habitat and a.id_animal= $animal_id";
-        $resultat = $conn->query($sql);
+//         $sql = " SELECT * FROM animaux a INNER JOIN habitats h on a.id_habitat= h.id_habitat and a.id_animal= $animal_id";
+//         $resultat = $conn->query($sql);
 
-        $animal = $resultat->fetch_assoc();
-    } else {
-        header("Location: ../connexion.php?error=access_denied");
-        exit();
-    }
+//         $animal = $resultat->fetch_assoc();
+//     } else {
+//         header("Location: ../connexion.php?error=access_denied");
+//         exit();
+//     }
 
-    if (!$animal) {
-        $error = "Animal non trouvé.";
-    }
-} else {
-    $error = "ID d'animal manquant.";
-}
+//     if (!$animal) {
+//         $error = "Animal non trouvé.";
+//     }
+// } else {
+//     $error = "ID d'animal manquant.";
+// } 
 ?>
 
 <!DOCTYPE html>
