@@ -1,10 +1,6 @@
 <?php
 
 require_once "../Fonctionalite_php/auth_check.php";
-protect_page('visiteur'); 
-       $id_utilisateur = htmlspecialchars($_SESSION['id']) ;
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role']);
 
 ?> 
 
@@ -130,6 +126,7 @@ protect_page('visiteur');
             <p class="text-center text-gray-500 mb-8">Cliquez pour voir les fiches détaillées de nos espèces emblématiques.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <
                 <?php foreach ($array_animaux as $animal) : ?>
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg group flex items-center border border-[#f3ede7]">
                         <img src="<?= $animal['image_url']?>" alt="<?= $animal['nom_animal'] ?>"

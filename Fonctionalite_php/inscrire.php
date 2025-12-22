@@ -13,7 +13,8 @@ if (
     $password = $_POST['password'];
     $regexNom = "/^[a-zA-ZÀ-ÿ\s]{3,50}$/";
     $regexEmail = "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/";
-    $regexPassword = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/";
+    $regexPassword = "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/";
+    
     if (!preg_match($regexNom, $fullName)) {
         header("Location: ../index.php?error=invalid_name");
         exit();
@@ -27,23 +28,29 @@ if (
         exit();
     }
     $allowedRoles = ['visiteur','guide'];
-    if (!in_array($role, $allowedRoles)) {
+    if (!in_array($role, $allowedRoles)) 
+    {
         header("Location: ../index.php?error=invalidRole");
         exit();
     }
-    if($role==='visiteur'){
+    if($role==='visiteur')
+    {
         $approuve = 1;
     }
-    else{
+    else
+    {
           $approuve = 0;
     }
     $hashedPassword = password_hash($password,PASSWORD_DEFAULT);
     $sql = "INSERT INTO utilisateurs (nom,role,approuve, email, mot_passe_hash) VALUES (?, ?, ?, ?)";
     $stmt = $connect->prepare($sql);
-    $stmt->bind_param("ssss", $fullName,$role,$approuve,$email,$hashedPassword);
-    if ($stmt->execute()) {
+    $stmt->bind_param("ssis", $fullName,$role,$approuve,$email,$hashedPassword);
+    if ($stmt->execute()) 
+    {
         header("Location: ../index.php?message=user_addedbien");
-    } else {
+    }
+     else 
+    {
       
         header("Location: ../index.php?error=db_erroremaildeja");
     }

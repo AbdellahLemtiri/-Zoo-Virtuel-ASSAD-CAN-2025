@@ -257,6 +257,8 @@ if ($id) {
                                     Liste des Participants
                                 </h3>
                             </div>
+
+                            
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
                                     <thead>

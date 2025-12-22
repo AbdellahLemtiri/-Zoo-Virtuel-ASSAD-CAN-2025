@@ -8,7 +8,6 @@ protect_page('admin');
 
 require_once "../Fonctionalite_php/connect.php";
 
-// --- 1. TRAITEMENT DES ACTIONS (POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
         $nom = $_POST['nom'];

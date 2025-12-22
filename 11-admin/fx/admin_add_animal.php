@@ -1,7 +1,6 @@
 <?php
 require_once "../../Fonctionalite_php/connect.php";
 
-// جلب البيانات من جدول "habitats"
 $sql = "SELECT * FROM habitats";
 $res = $connect->query($sql);
 $habitats = [];
