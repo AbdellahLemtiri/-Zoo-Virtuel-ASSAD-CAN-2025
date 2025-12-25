@@ -26,15 +26,21 @@ if (
         header("Location: ../index.php?error=weak_password");
         exit();
     }
-    $allowedRoles = ['visiteur', 'guide'];
+    $allowedRoles = ['visiteur','guide'];
     if (!in_array($role, $allowedRoles)) {
-        header("Location: ../index.php?error=invalid_role");
+        header("Location: ../index.php?error=invalidRole");
         exit();
     }
+    if($role==='visiteur'){
+        $approuve = 1;
+    }
+    else{
+          $approuve = 0;
+    }
     $hashedPassword = password_hash($password,PASSWORD_DEFAULT);
-    $sql = "INSERT INTO utilisateurs (nom,role, email, mot_passe_hash) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO utilisateurs (nom,role,approuve, email, mot_passe_hash) VALUES (?, ?, ?, ?)";
     $stmt = $connect->prepare($sql);
-    $stmt->bind_param("ssss", $fullName, $role, $email, $hashedPassword);
+    $stmt->bind_param("ssss", $fullName,$role,$approuve,$email,$hashedPassword);
     if ($stmt->execute()) {
         header("Location: ../index.php?message=user_addedbien");
     } else {
